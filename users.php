@@ -84,7 +84,7 @@ include 'includes/navbar.php';
         }
 
         // สร้างคำสั่ง SQL เพื่อดึงข้อมูล
-        $sql = "SELECT user_id, fullname, password, role, lasttime_Login, status FROM users";
+        $sql = "SELECT user_id, fullname, username, password, role, lasttime_Login, status FROM users";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
@@ -95,6 +95,7 @@ include 'includes/navbar.php';
             echo '<thead>';
             echo '<tr>';
             echo '<th>Name</th>';
+            echo '<th>Username</th>';
             echo '<th>Password</th>';
             echo '<th>Role</th>';
             echo '<th>Lasttime Login</th>';
@@ -105,6 +106,7 @@ include 'includes/navbar.php';
             while ($row = $result->fetch_assoc()) {
                 echo '<tr>';
                 echo '<td>' . $row["fullname"] . '</td>';
+                echo '<td>' . $row["username"] . '</td>';
                 echo '<td>' . $row["password"] . '</td>';
                 echo '<td>' . $row["role"] . '</td>';
                 echo '<td>' . $row["lasttime_Login"] . '</td>';

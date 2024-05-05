@@ -27,62 +27,53 @@ include 'includes/navbar.php';
 
         // สร้างคำสั่ง SQL เพื่อดึงข้อมูล
         $sql = "SELECT 
-        floor_number,	
-        room_number,	
-        toilet_gender,	
-        room_type,	
-        toilet_clean,
-        room_clean,	
-        toilet_paper_supply,	
-        room_furniture	 FROM floors";
+    t.task_title,
+    t.task_description,
+    t.start_date,
+    u.fullname AS user_fullname,
+    t.floor_number,	
+    t.room_number,	
+    t.room_status,
+    t.room_type,	
+    t.toilet_gender,
+    t.toilet_status	 FROM task t
+    INNER JOIN users u ON t.user_id = u.user_id";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
-            // แสดงข้อมูลในรูปแบบของตาราง HTML
             echo '<div class="card-body">';
             echo '<div class="table-responsive">';
             echo '<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">';
             echo '<thead>';
             echo '<tr>';
-            echo '<th>Floors</th>';
+            echo '<th>Title</th>';
+            echo '<th>Description</th>';
+            echo '<th>Start Date</th>';
+            echo '<th>User</th>';
+            echo '<th>Floor</th>';
             echo '<th>Room</th>';
-            echo '<th>Room type</th>';
-            echo '<th>Room clean</th>';
+            echo '<th>Room Status</th>';
+            echo '<th>Type</th>';
             echo '<th>Toilet Gender</th>';
-            echo '<th>Toilet clean</th>';
-            echo '<th>Toilet Supply</th>';
-            echo '<th>Furniture</th>';
+            echo '<th>Toilet Status</th>';
             echo '</tr>';
             echo '</thead>';
             echo '<tbody>';
             while ($row = $result->fetch_assoc()) {
                 echo '<tr>';
-                echo '<td>ชั้น ' . $row["floor_number"] . '</td>';
-                echo '<td>' . $row["room_number"] . '</td>';
-                echo '<td>' . $row["room_type"] . '</td>';
-                echo '<td>';
-                if ($row["room_clean"] == 'Y') {
-                    echo 'Yes';
-                } elseif ($row["room_clean"] == 'N') {
-                    echo 'No';
-                } else {
-                    echo 'ไม่ระบุ';
-                }
-                echo '</td>';
-                echo '<td>' . $row["toilet_gender"] . '</td>';
-                echo '<td>';
-                if ($row["toilet_clean"] == 'Y') {
-                    echo 'Yes';
-                } elseif ($row["toilet_clean"] == 'N') {
-                    echo 'No';
-                } else {
-                    echo 'Yes';
-                }
-                echo '</td>';
-                echo '<td>' . $row["toilet_paper_supply"] . '</td>';
-                echo '<td>' . $row["room_furniture"] . '</td>';
+                echo '<td>' . ($row["task_title"] ?? '-') . '</td>';
+                echo '<td>' . ($row["task_description"] ?? '-') . '</td>';
+                echo '<td>' . ($row["start_date"] ?? '-') . '</td>';
+                echo '<td>' . ($row["user_fullname"] ?? '-') . '</td>';
+                echo '<td>ชั้น ' . ($row["floor_number"] ?? '-') . '</td>';
+                echo '<td>' . ($row["room_number"] ?? '-') . '</td>';
+                echo '<td>' . ($row["room_type"] ?? '-') . '</td>';
+                echo '<td>' . ($row["room_status"] ?? '-') . '</td>';
+                echo '<td>' . ($row["toilet_gender"] ?? '-') . '</td>';
+                echo '<td>' . ($row["toilet_status"] ?? '-') . '</td>';
                 echo '</tr>';
             }
+
             echo '</tbody>';
             echo '</table>';
             echo '</div>';
@@ -95,6 +86,7 @@ include 'includes/navbar.php';
         $conn->close();
         ?>
     </div>
+
 
 </div>
 <!-- /.container-fluid -->

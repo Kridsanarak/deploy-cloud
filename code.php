@@ -38,8 +38,8 @@ if(isset($_POST['registerbtn'])) {
     // ปิดการเชื่อมต่อ
     $connection->close();
 
-    // นำกลับไปยังหน้า register.php
-    header('Location: register.php');
+    // นำกลับไปยังหน้า users.php
+    header('Location: users.php');
 }
 
 if(isset($_POST['deleteUserId'])) {
