@@ -223,7 +223,7 @@ include 'includes/calendar.php';
                     <div id='calendar'></div>
                     <style>
                         #calendar {
-                            max-width: 700px;
+                            max-width: 1000px;
                             width: 100%;
                             margin: 0 auto;
                         }
@@ -237,41 +237,109 @@ include 'includes/calendar.php';
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Notify</h6>
-                    <div class="dropdown no-arrow">
-                        <!-- <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                    </a> -->
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                            aria-labelledby="dropdownMenuLink">
-                            <div class="dropdown-header">Dropdown Header:</div>
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Something else here</a>
-                        </div>
-                    </div>
+                    <h6 class="m-0 font-weight-bold text-primary">Tomorrow Notify</h6>
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
-                    <div class="chart-pie pt-4 pb-2">
-                        <canvas id="myPieChart"></canvas>
-                    </div>
-                    <div class="mt-4 text-center small">
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-primary"></i> Direct
-                        </span>
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-success"></i> Social
-                        </span>
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-info"></i> Referral
-                        </span>
+                    <div class="accordion" id="taskAccordion">
+                        <?php
+                        // การกำหนดค่าในการเชื่อมต่อฐานข้อมูล
+                        $servername = "localhost";
+                        $username = "root";
+                        $password = "";
+                        $dbname = "project";
+
+                        // การเชื่อมต่อกับ MySQL
+                        $conn = new mysqli($servername, $username, $password, $dbname);
+
+                        // ตรวจสอบการเชื่อมต่อ
+                        if ($conn->connect_error) {
+                            die("การเชื่อมต่อล้มเหลว: " . $conn->connect_error);
+                        }
+
+                        // สร้างคำสั่ง SQL เพื่อดึงข้อมูล
+                        $today = date('Y-m-d');
+                        $tomorrow = date('Y-m-d', strtotime('+1 day'));
+                        $sql = "SELECT * FROM task WHERE user_id = 3 AND start_date = '$tomorrow'";
+                        $result = $conn->query($sql);
+
+                        if ($result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                echo '<div class="card">';
+                                echo '<div class="card-header" id="heading' . $row["task_id"] . '">';
+                                echo '<h2 class="mb-0">';
+                                echo '<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse' . $row["task_id"] . '" aria-expanded="true" aria-controls="collapse' . $row["task_id"] . '">';
+                                echo $row["task_title"];
+                                echo '</button>';
+                                echo '</h2>';
+                                echo '</div>';
+                                echo '<div id="collapse' . $row["task_id"] . '" class="collapse" aria-labelledby="heading' . $row["task_id"] . '" data-parent="#taskAccordion">';
+                                echo '<div class="card-body">';
+                                echo '<p>';
+                                echo 'รายละเอียด: ' . $row["task_description"] . '<br>';
+                                echo 'เริ่ม: ' . $row["start_date"] . '<br>';
+                                echo 'ชั้น: ' . $row["floor_number"] . '<br>';
+                                echo 'ห้อง: ' . $row["room_number"] . '<br>';
+                                echo 'สถานะ: ';
+                                switch ($row["room_status"]) {
+                                    case 'Ready':
+                                        echo 'พร้อม';
+                                        break;
+                                    case 'Not Ready':
+                                        echo 'ไม่พร้อม';
+                                        break;
+                                    case 'Waiting':
+                                        echo 'รอทำความสะอาด';
+                                        break;
+                                    default:
+                                        echo $row["room_status"];
+                                        break;
+                                }
+                                echo '<br>';
+                                echo 'ประเภท: ' . $row["room_type"] . '<br>';
+                                echo 'ห้องน้ำ: ';
+                                if ($row["toilet_gender"] == 'male') {
+                                    echo 'ชาย';
+                                } elseif ($row["toilet_gender"] == 'female') {
+                                    echo 'หญิง';
+                                } else {
+                                    echo $row["toilet_gender"];
+                                }
+                                echo '<br>';
+                                echo 'สถานะ: ';
+                                switch ($row["toilet_status"]) {
+                                    case 'Ready':
+                                        echo 'พร้อม';
+                                        break;
+                                    case 'Not Ready':
+                                        echo 'ไม่พร้อม';
+                                        break;
+                                    case 'Waiting':
+                                        echo 'รอทำความสะอาด';
+                                        break;
+                                    default:
+                                        echo $row["toilet_status"];
+                                        break;
+                                }
+                                echo '<br>';
+                                echo '</p>';
+                                echo '</div>';
+                                echo '</div>';
+                                echo '</div>';
+                            }
+                        } else {
+                            echo "No tasks found for tomorrow.";
+                        }
+
+                        // ปิดการเชื่อมต่อกับฐานข้อมูล
+                        $conn->close();
+                        ?>
                     </div>
                 </div>
+
             </div>
         </div>
+
     </div>
 
 

@@ -118,9 +118,10 @@ include 'includes/navbar.php';
                 echo '<td>' . $row["lasttime_Login"] . '</td>';
                 echo '<td>' . $row["status"] . '</td>';
                 // เพิ่มปุ่ม edit user
-                echo '<td><button class="btn btn-primary btn-circle btn-sm" data-toggle="modal" data-target="#editadminprofile' . $row["user_id"] . '"><i class="fas fa-edit"></i></button></td>';
-                // เพิ่มปุ่ม delete user
-                echo '<td><button class="btn btn-danger btn-circle btn-sm" onclick="deleteUser(' . $row["user_id"] . ')"><i class="fas fa-trash"></i></button></td>';
+                echo '<td>
+                <button class="btn btn-primary btn-circle btn-sm mr-1" data-toggle="modal" data-target="#editadminprofile' . $row["user_id"] . '"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-danger btn-circle btn-sm" onclick="deleteUser(' . $row["user_id"] . ')"><i class="fas fa-trash"></i></button>
+                </td>';
                 echo '</tr>';
 
                 // เพิ่มโมดัลเชียลแก้ไขผู้ใช้ (edit user modal) ด้วย ID ที่ไม่ซ้ำกันตาม user_id
