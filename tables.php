@@ -28,21 +28,23 @@ include 'includes/navbar.php';
 
         // สร้างคำสั่ง SQL เพื่อดึงข้อมูล
         $sql = "SELECT 
-        t.task_id,
-        t.task_title,
-        t.task_description,
-        t.start_date,
-        u.fullname AS user_fullname,
-        t.floor_number,   
-        t.room_number,    
-        t.room_status,
-        t.room_type,    
-        t.toilet_gender,
-        t.toilet_status,
-        t.image,
-        t.user_id
-    FROM task t
-    INNER JOIN users u ON t.user_id = u.user_id";
+    t.task_id,
+    t.task_title,
+    t.start_date,
+    t.task_description,
+    u.fullname AS user_fullname,
+    t.floor_number,   
+    t.room_number,    
+    t.room_status,
+    t.room_type,    
+    t.toilet_gender,
+    t.toilet_status,
+    t.image,
+    t.user_id
+FROM task t
+INNER JOIN users u ON t.user_id = u.user_id
+ORDER BY t.start_date ASC";  // เรียงตาม start_date จากน้อยไปหามาก
+        
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
@@ -51,9 +53,9 @@ include 'includes/navbar.php';
             echo '<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">';
             echo '<thead>';
             echo '<tr>';
+            echo '<th>Start Date</th>';
             echo '<th>Title</th>';
             echo '<th>Description</th>';
-            echo '<th>Start Date</th>';
             echo '<th>User</th>';
             echo '<th>Floor</th>';
             echo '<th>Type</th>';
@@ -66,11 +68,11 @@ include 'includes/navbar.php';
             echo '<tbody>';
             while ($row = $result->fetch_assoc()) {
                 echo '<tr>';
+                echo '<td>' . ($row["start_date"] ?? '-') . '</td>';
                 echo '<td>' . ($row["task_title"] ?? '-') . '</td>';
                 echo '<td>' . ($row["task_description"] ?? '-') . '</td>';
-                echo '<td>' . ($row["start_date"] ?? '-') . '</td>';
                 echo '<td>' . ($row["user_fullname"] ?? '-') . '</td>';
-                echo '<td>IF-' . ($row["floor_number"] ?? '-') .'0'. ($row["room_number"] ?? '-') .'</td>';
+                echo '<td>IF-' . ($row["floor_number"] ?? '-') . '0' . ($row["room_number"] ?? '-') . '</td>';
                 echo '<td>' . ($row["room_type"] ?? '-') . '</td>';
                 echo '<td>';
                 if ($row["room_status"] == 'Ready') {
@@ -78,7 +80,7 @@ include 'includes/navbar.php';
                 } elseif ($row["room_status"] == 'Not Ready') {
                     echo 'ไม่พร้อม';
                 } elseif ($row["room_status"] == 'Waiting') {
-                    echo 'รอทำความสะอาด';
+                    echo 'รอ';
                 } else {
                     echo ($row["room_status"] ?? '-');
                 }
@@ -99,7 +101,7 @@ include 'includes/navbar.php';
                 } elseif ($row["toilet_status"] == 'Not Ready') {
                     echo 'ไม่พร้อม';
                 } elseif ($row["toilet_status"] == 'Waiting') {
-                    echo 'รอทำความสะอาด';
+                    echo 'รอ';
                 } else {
                     echo ($row["toilet_status"] ?? '-');
                 }
@@ -181,13 +183,13 @@ include 'includes/navbar.php';
                 if (!empty($row["image"])) {
                     // ระบุตำแหน่งของโฟลเดอร์ upload ของคุณ
                     $upload_dir = "upload/";
-                
+
                     // เรียกใช้ชื่อไฟล์รูปภาพจากฐานข้อมูล
                     $image_name = $row["image"];
-                
+
                     // รวมตำแหน่งของไฟล์รูปภาพ
                     $image_path = $upload_dir . $image_name;
-                
+
                     // แสดงรูปภาพ
                     echo '<img src="' . $image_path . '" class="img-fluid" alt="Image">';
                 } else {
@@ -200,7 +202,7 @@ include 'includes/navbar.php';
                 echo '</div>';
                 echo '</div>';
                 echo '</div>';
-                
+
 
 
 

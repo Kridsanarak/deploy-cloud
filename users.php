@@ -89,7 +89,7 @@ include 'includes/navbar.php';
         }
 
         // สร้างคำสั่ง SQL เพื่อดึงข้อมูล
-        $sql = "SELECT user_id, fullname, username, password, role, lasttime_Login, status FROM users";
+        $sql = "SELECT * FROM users WHERE user_id <> 1";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
@@ -113,9 +113,10 @@ include 'includes/navbar.php';
                 echo '<tr>';
                 echo '<td>' . $row["fullname"] . '</td>';
                 echo '<td>' . $row["username"] . '</td>';
-                echo '<td>' . $row["password"] . '</td>';
+                echo '<td>' . str_repeat('*', strlen($row["password"])) . '</td>';
+
                 echo '<td>' . $row["role"] . '</td>';
-                echo '<td>' . $row["lasttime_Login"] . '</td>';
+                echo '<td>' . $row["lasttime_login"] . '</td>';
                 echo '<td>' . $row["status"] . '</td>';
                 // เพิ่มปุ่ม edit user
                 echo '<td>

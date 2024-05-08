@@ -226,7 +226,7 @@ include 'includes/calendar.php';
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Tomorrow Notify</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Today Notify</h6>
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
@@ -245,9 +245,10 @@ include 'includes/calendar.php';
 
                         <?php
                         // สร้างคำสั่ง SQL เพื่อดึงข้อมูล
+                        date_default_timezone_set('Asia/Bangkok');
                         $today = date('Y-m-d');
-                        $tomorrow = date('Y-m-d', strtotime('+1 day'));
-                        $sql = "SELECT * FROM task WHERE user_id = 2 AND start_date = '$tomorrow'";
+                        // $tomorrow = date('Y-m-d', strtotime('+1 day'));
+                        $sql = "SELECT * FROM task WHERE user_id = 2 AND start_date = '$today'";
                         $result = $conn->query($sql);
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
