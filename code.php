@@ -70,5 +70,46 @@ if(isset($_POST['deleteUserId'])) {
     }
 }
 
+if (isset($_POST['add_task_btn'])) {
+    $servername = "localhost";
+    $username = "root";
+    $password = "";
+    $dbname = "project";
+
+    $connection = new mysqli($servername, $username, $password, $dbname);
+
+    if ($connection->connect_error) {
+        die("Connection failed: " . $connection->connect_error);
+    }
+    $user_id = $_POST['user_id'];
+    $task_title = $_POST['task_title'];
+    $task_description = $_POST['task_description'];
+    $start_date = $_POST['start_date'];
+    $floor_number = $_POST['floor_number'];
+    $room_number = $_POST['room_number'];
+    $room_status = $_POST['room_status'];
+    $room_type = $_POST['room_type'];
+    $toilet_gender = $_POST['toilet_gender'];
+    $toilet_status = $_POST['toilet_status'];
+
+    // คำสั่ง SQL เพื่อเพิ่มข้อมูลงาน
+    $query = "INSERT INTO task (user_id, task_title, task_description, start_date, floor_number, room_number, room_status, room_type, toilet_gender, toilet_status) 
+              VALUES ('$user_id', '$task_title', '$task_description', '$start_date', '$floor_number', '$room_number', '$room_status', '$room_type', '$toilet_gender', '$toilet_status')";
+    // ทำการ query คำสั่ง SQL
+    if (mysqli_query($connection, $query)) {
+        $_SESSION['status'] = "Task added successfully!";
+        $_SESSION['status_code'] = "success";
+    } else {
+        $_SESSION['status'] = "Failed to add task";
+        $_SESSION['status_code'] = "error";
+    }
+
+    // ปิดการเชื่อมต่อ
+    $connection->close();
+
+    // นำกลับไปยังหน้า tables.php
+    header('Location: tables.php');
+
+}
 
 ?>

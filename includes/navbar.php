@@ -29,7 +29,7 @@
 
     <!-- Nav Item - Pages Collapse Menu -->
     <li class="nav-item">
-        <a class="nav-link" href="main.php">
+        <a class="nav-link" href="addtask.php">
             <i class="fas fa-fw fa-edit"></i>
             <span>Work</span></a>
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true"
