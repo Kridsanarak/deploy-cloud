@@ -37,18 +37,18 @@ include 'includes/calendar.php';
     $result_total_room_count = $conn->query($sql_total_room_count);
 
     // สร้างคำสั่ง SQL เพื่อนับจำนวนห้องที่ทำความสะอาดแล้ว (โดยใช้เงื่อนไขเฉพาะที่ room_status เป็น Ready)
-    $sql_cleaned_room_count = "SELECT COUNT(task_id) AS cleaned_rooms FROM task WHERE room_status = 'Ready'";
+    $sql_cleaned_room_count = "SELECT COUNT(task_id) AS cleaned_rooms FROM task WHERE room_status = 'Ready' AND WEEK(start_date) = WEEK(NOW())";
     $result_cleaned_room_count = $conn->query($sql_cleaned_room_count);
 
 
-    $sql_complete_room_count = "SELECT COUNT(task_id) AS complete_rooms FROM task WHERE room_status = 'Ready'";
+    $sql_complete_room_count = "SELECT COUNT(task_id) AS complete_rooms FROM task WHERE room_status = 'Ready' AND WEEK(start_date) = WEEK(NOW())";
     $result_complete_room_count = $conn->query($sql_complete_room_count);
 
     $sql_top_floor_count = "SELECT floor_number, COUNT(*) AS floor_count
                     FROM task
                     GROUP BY floor_number
                     ORDER BY floor_count DESC
-                    LIMIT 2";
+                    LIMIT 3";
     $result_top_floor_count = $conn->query($sql_top_floor_count);
 
 
@@ -81,7 +81,6 @@ include 'includes/calendar.php';
                                     echo "0";
                                 }
                                 ?>
-
                             </div>
                         </div>
                         <div class="col-auto">
@@ -195,22 +194,12 @@ include 'includes/calendar.php';
                 </div>
             </div>
         </div>
-
-
     </div>
-
-
-
-
-
-    <?php
-    // ปิดการเชื่อมต่อกับ MySQL
-    $conn->close();
-    ?>
 
 
     <!-- Content Row -->
     <div class="row">
+
         <!-- Area Chart -->
         <div class="col-xl-8 col-lg-7">
             <div class="card shadow mb-4">
@@ -242,27 +231,24 @@ include 'includes/calendar.php';
                 <!-- Card Body -->
                 <div class="card-body">
                     <div class="accordion" id="taskAccordion">
+                        <style>
+                            .card-body p {
+                                font-family: 'Prompt', sans-serif;
+                                font-size: 16px;
+                                /* ปรับขนาด font ตามต้องการ */
+                                color: #333;
+                                /* สีข้อความ */
+                                padding: 10px;
+                                /* ระยะห่างของข้อความ */
+                            }
+                        </style>
+
                         <?php
-                        // การกำหนดค่าในการเชื่อมต่อฐานข้อมูล
-                        $servername = "localhost";
-                        $username = "root";
-                        $password = "";
-                        $dbname = "project";
-
-                        // การเชื่อมต่อกับ MySQL
-                        $conn = new mysqli($servername, $username, $password, $dbname);
-
-                        // ตรวจสอบการเชื่อมต่อ
-                        if ($conn->connect_error) {
-                            die("การเชื่อมต่อล้มเหลว: " . $conn->connect_error);
-                        }
-
                         // สร้างคำสั่ง SQL เพื่อดึงข้อมูล
                         $today = date('Y-m-d');
                         $tomorrow = date('Y-m-d', strtotime('+1 day'));
-                        $sql = "SELECT * FROM task WHERE user_id = 3 AND start_date = '$tomorrow'";
+                        $sql = "SELECT * FROM task WHERE user_id = 2 AND start_date = '$tomorrow'";
                         $result = $conn->query($sql);
-
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
                                 echo '<div class="card">';
@@ -309,7 +295,7 @@ include 'includes/calendar.php';
                                 echo 'สถานะ: ';
                                 switch ($row["toilet_status"]) {
                                     case 'Ready':
-                                        echo 'พร้อม';
+                                        echo 'ทำความสะอาดแล้ว';
                                         break;
                                     case 'Not Ready':
                                         echo 'ไม่พร้อม';
@@ -330,20 +316,16 @@ include 'includes/calendar.php';
                         } else {
                             echo "No tasks found for tomorrow.";
                         }
-
-                        // ปิดการเชื่อมต่อกับฐานข้อมูล
-                        $conn->close();
                         ?>
                     </div>
                 </div>
-
             </div>
         </div>
-
     </div>
-
-
-
+    <?php
+    // ปิดการเชื่อมต่อกับ MySQL
+    $conn->close();
+    ?>
 </div>
 
 <?php

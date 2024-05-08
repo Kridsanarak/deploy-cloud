@@ -56,7 +56,6 @@ include 'includes/navbar.php';
             echo '<th>Start Date</th>';
             echo '<th>User</th>';
             echo '<th>Floor</th>';
-            echo '<th>Room</th>';
             echo '<th>Type</th>';
             echo '<th>Room Status</th>';
             echo '<th>Toilet Gender</th>';
@@ -71,8 +70,7 @@ include 'includes/navbar.php';
                 echo '<td>' . ($row["task_description"] ?? '-') . '</td>';
                 echo '<td>' . ($row["start_date"] ?? '-') . '</td>';
                 echo '<td>' . ($row["user_fullname"] ?? '-') . '</td>';
-                echo '<td>ชั้น ' . ($row["floor_number"] ?? '-') . '</td>';
-                echo '<td>' . ($row["room_number"] ?? '-') . '</td>';
+                echo '<td>IF-' . ($row["floor_number"] ?? '-') .'0'. ($row["room_number"] ?? '-') .'</td>';
                 echo '<td>' . ($row["room_type"] ?? '-') . '</td>';
                 echo '<td>';
                 if ($row["room_status"] == 'Ready') {
