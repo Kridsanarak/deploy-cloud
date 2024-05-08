@@ -114,7 +114,6 @@ include 'includes/navbar.php';
                 echo '<td>' . $row["fullname"] . '</td>';
                 echo '<td>' . $row["username"] . '</td>';
                 echo '<td>' . str_repeat('*', strlen($row["password"])) . '</td>';
-
                 echo '<td>' . $row["role"] . '</td>';
                 echo '<td>' . $row["lasttime_login"] . '</td>';
                 echo '<td>' . $row["status"] . '</td>';
@@ -176,7 +175,6 @@ include 'includes/navbar.php';
                 echo '</div>';
                 echo '</div>';
             }
-
             echo '</tbody>';
             echo '</table>';
             echo '</div>';
