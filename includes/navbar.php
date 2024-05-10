@@ -32,7 +32,7 @@
         <a class="nav-link" href="addtask.php">
             <i class="fas fa-fw fa-edit"></i>
             <span>Work</span></a>
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true"
+        <!-- <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true"
             aria-controls="collapseTwo">
             <i class="fas fa-fw fa-cog"></i>
             <span>Components</span>
@@ -43,11 +43,11 @@
                 <a class="collapse-item" href="buttons.html">Buttons</a>
                 <a class="collapse-item" href="cards.html">Cards</a>
             </div>
-        </div>
+        </div> -->
     </li>
 
     <!-- Nav Item - Utilities Collapse Menu -->
-    <li class="nav-item">
+    <!-- <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
             aria-expanded="true" aria-controls="collapseUtilities">
             <i class="fas fa-fw fa-wrench"></i>
@@ -62,7 +62,7 @@
                 <a class="collapse-item" href="utilities-other.html">Other</a>
             </div>
         </div>
-    </li>
+    </li> -->
 
     <!-- Divider -->
     <hr class="sidebar-divider">
@@ -73,7 +73,7 @@
     </div>
 
     <!-- Nav Item - Pages Collapse Menu -->
-    <li class="nav-item">
+    <!-- <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true"
             aria-controls="collapsePages">
             <i class="fas fa-fw fa-folder"></i>
@@ -90,7 +90,7 @@
                 <a class="collapse-item" href="blank.html">Blank Page</a>
             </div>
         </div>
-    </li>
+    </li> -->
 
     <!-- Nav Item - Users -->
     <li class="nav-item">
@@ -104,12 +104,6 @@
         <a class="nav-link" href="tables.php">
             <i class="fas fa-fw fa-table"></i>
             <span>Tables</span></a>
-    </li>
-    <!-- Nav Item - Tables -->
-    <li class="nav-item">
-        <a class="nav-link" href="table_user.php">
-            <i class="fas fa-fw fa-table"></i>
-            <span>Table User</span></a>
     </li>
 
     <!-- Divider -->

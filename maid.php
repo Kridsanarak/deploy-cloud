@@ -181,7 +181,7 @@ include 'includes/maid_navbar.php';
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1"
                                 style="font-family: Prompt; font-size: 14.5px;">
-                                ชั้นที่ได้รับมอบหมาย
+                                ชั้นที่ได้รับมอบหมายสัปดาห์นี้
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                 <?php echo implode(', ', $floor_numbers); ?>
@@ -205,7 +205,7 @@ include 'includes/maid_navbar.php';
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Work</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Work This Week</h6>
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
@@ -228,7 +228,7 @@ include 'includes/maid_navbar.php';
                 t.user_id
             FROM task t
             INNER JOIN users u ON t.user_id = u.user_id
-            WHERE t.user_id = {$_SESSION['user_id']} AND t.start_date >= '$today'  -- เพิ่มเงื่อนไขเพื่อกรองวันที่เริ่มต้นหลังจากวันที่ปัจจุบัน
+            WHERE t.user_id = {$_SESSION['user_id']} AND WEEK(start_date) = WEEK(NOW())  -- เพิ่มเงื่อนไขเพื่อกรองวันที่เริ่มต้นหลังจากวันที่ปัจจุบัน
             ORDER BY t.start_date ASC";
 
                     $result = $conn->query($sql);
@@ -240,7 +240,7 @@ include 'includes/maid_navbar.php';
                         echo '<thead>';
                         echo '<tr>';
                         echo '<th>Start Date</th>';
-                        echo '<th>Title</th>';
+                        echo '<th>Task</th>';
                         echo '<th>Floor</th>';
                         echo '<th>Type</th>';
                         echo '</tr>';
@@ -327,14 +327,20 @@ include 'includes/maid_navbar.php';
                                 echo '<div class="card-header" id="heading' . $row["task_id"] . '">';
                                 echo '<h2 class="mb-0">';
                                 echo '<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse' . $row["task_id"] . '" aria-expanded="true" aria-controls="collapse' . $row["task_id"] . '">';
-                                echo $row["task_title"];
+                                $status_icon = '';
+                                if ($row["room_status"] == 'Ready' && $row["toilet_status"] == 'Ready') {
+                                    $status_icon = '<i class="fas fa-check-circle text-success"></i>'; // Green check square icon
+                                } else {
+                                    $status_icon = '<i class="fas fa-exclamation-circle text-danger"></i>'; // Red square icon
+                                }
+                                echo "IF-" . $row["floor_number"] . '0' . $row["room_number"] . ' - ' . $row["task_title"] . ' ' . $status_icon;
                                 echo '</button>';
                                 echo '</h2>';
                                 echo '</div>';
                                 echo '<div id="collapse' . $row["task_id"] . '" class="collapse" aria-labelledby="heading' . $row["task_id"] . '" data-parent="#taskAccordion">';
                                 echo '<div class="card-body">';
                                 echo '<p>';
-                                echo 'รายละเอียด: ' . $row["task_description"] . '<br>';
+                                echo 'รายละเอียด:<br>';
                                 echo 'เริ่ม: ' . $row["start_date"] . '<br>';
                                 echo 'ชั้น: ' . $row["floor_number"] . '<br>';
                                 echo 'ห้อง: ' . $row["room_number"] . '<br>';

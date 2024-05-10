@@ -110,7 +110,13 @@ ORDER BY t.start_date ASC";
                 }
                 echo '</td>';
                 echo '<td>';
-                echo '<button type="button" class="btn btn-success btn-circle btn-sm" data-toggle="modal" data-target="#submitWorkModal' . $row["task_id"] . '"><i class="fas fa-paper-plane"></i></button>';
+                if ($row["room_status"] == 'Ready' && $row["toilet_status"] == 'Ready') {
+                    // ถ้า room_status และ toilet_status เป็น 'Ready' ทั้งคู่
+                    echo '<button type="button" class="btn btn-secondary btn-circle btn-sm" disabled><i class="fas fa-paper-plane"></i></button>';
+                } else {
+                    // ถ้าไม่ใช่
+                    echo '<button type="button" class="btn btn-success btn-circle btn-sm" data-toggle="modal" data-target="#submitWorkModal' . $row["task_id"] . '"><i class="fas fa-paper-plane"></i></button>';
+                }
                 echo '  ';
                 echo '<button type="button" class="btn btn-info btn-circle btn-sm" data-toggle="modal" data-target="#imageModal' . $row["task_id"] . '"><i class="fas fa-image"></i></button>';
                 echo '</td>';
@@ -243,9 +249,9 @@ ORDER BY t.start_date ASC";
 
 <script src="vendor/jquery/jquery.min.js"></script>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         // เมื่อมีการเลือกไฟล์
-        $('.custom-file-input').on('change', function() {
+        $('.custom-file-input').on('change', function () {
             var fileName = $(this).val().split('\\').pop(); // ดึงชื่อไฟล์ออกมาจาก path
             $(this).next('.custom-file-label').html(fileName); // แสดงชื่อไฟล์ใน label
         });
