@@ -1,6 +1,6 @@
 <?php
 include 'includes/header.php';
-include 'includes/navbar.php';
+include 'includes/maid_navbar.php';
 ?>
 
 <!-- Begin Page Content -->
@@ -46,7 +46,7 @@ include 'includes/navbar.php';
     $sql_floor_user = "SELECT t.floor_number, COUNT(*) AS floor_count
     FROM task t
     INNER JOIN users u ON t.user_id = u.user_id
-    WHERE WEEK(t.start_date) = WEEK(NOW()) AND u.user_id = 3
+    WHERE WEEK(t.start_date) = WEEK(NOW()) AND u.user_id = {$_SESSION['user_id']} 
     GROUP BY t.floor_number
     ORDER BY floor_count DESC";    
     $result_floor_user = $conn->query($sql_floor_user);
@@ -210,23 +210,25 @@ include 'includes/navbar.php';
                 <!-- Card Body -->
                 <div class="card-body">
                     <?php
+                    $today = date("Y-m-d");  // วันที่ปัจจุบัน
                     $sql = "SELECT 
-    t.task_id,
-    t.task_title,
-    t.start_date,
-    t.task_description,
-    u.fullname AS user_fullname,
-    t.floor_number,   
-    t.room_number,    
-    t.room_status,
-    t.room_type,    
-    t.toilet_gender,
-    t.toilet_status,
-    t.image,
-    t.user_id
-FROM task t
-INNER JOIN users u ON t.user_id = u.user_id
-ORDER BY t.start_date ASC";  // เรียงตาม start_date จากน้อยไปหามาก
+                t.task_id,
+                t.task_title,
+                t.start_date,
+                t.task_description,
+                u.fullname AS user_fullname,
+                t.floor_number,   
+                t.room_number,    
+                t.room_status,
+                t.room_type,    
+                t.toilet_gender,
+                t.toilet_status,
+                t.image,
+                t.user_id
+            FROM task t
+            INNER JOIN users u ON t.user_id = u.user_id
+            WHERE t.user_id = {$_SESSION['user_id']} AND t.start_date >= '$today'  -- เพิ่มเงื่อนไขเพื่อกรองวันที่เริ่มต้นหลังจากวันที่ปัจจุบัน
+            ORDER BY t.start_date ASC";
                     
                     $result = $conn->query($sql);
 
@@ -294,7 +296,7 @@ ORDER BY t.start_date ASC";  // เรียงตาม start_date จากน
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Today Notify</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Today Work Detail</h6>
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
@@ -316,7 +318,7 @@ ORDER BY t.start_date ASC";  // เรียงตาม start_date จากน
                         date_default_timezone_set('Asia/Bangkok');
                         $today = date('Y-m-d');
                         // $tomorrow = date('Y-m-d', strtotime('+1 day'));
-                        $sql = "SELECT * FROM task WHERE user_id = 2 AND start_date = '$today'";
+                        $sql = "SELECT * FROM task WHERE user_id = {$_SESSION['user_id']} AND start_date = '$today'";
                         $result = $conn->query($sql);
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
