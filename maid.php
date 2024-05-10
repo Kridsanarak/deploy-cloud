@@ -28,19 +28,19 @@ include 'includes/maid_navbar.php';
     }
 
     // สร้างคำสั่ง SQL เพื่อนับจำนวนห้องที่ใช้สัปดาห์นี้
-    $sql_weekly_room_count = "SELECT COUNT(task_id) AS room_count FROM task WHERE WEEK(start_date) = WEEK(NOW())";
+    $sql_weekly_room_count = "SELECT COUNT(task_id) AS room_count FROM task WHERE WEEK(start_date) = WEEK(NOW()) AND user_id = {$_SESSION['user_id']} ";
     $result_weekly_room_count = $conn->query($sql_weekly_room_count);
 
 
-    $sql_total_room_count = "SELECT COUNT(task_id) AS total_rooms FROM task WHERE WEEK(start_date) = WEEK(NOW())";
+    $sql_total_room_count = "SELECT COUNT(task_id) AS total_rooms FROM task WHERE WEEK(start_date) = WEEK(NOW()) AND user_id = {$_SESSION['user_id']} ";
     $result_total_room_count = $conn->query($sql_total_room_count);
 
     // สร้างคำสั่ง SQL เพื่อนับจำนวนห้องที่ทำความสะอาดแล้ว (โดยใช้เงื่อนไขเฉพาะที่ room_status เป็น Ready)
-    $sql_cleaned_room_count = "SELECT COUNT(task_id) AS cleaned_rooms FROM task WHERE room_status = 'Ready' AND WEEK(start_date) = WEEK(NOW())";
+    $sql_cleaned_room_count = "SELECT COUNT(task_id) AS cleaned_rooms FROM task WHERE room_status = 'Ready' AND toilet_status = 'Ready' AND WEEK(start_date) = WEEK(NOW()) AND user_id = {$_SESSION['user_id']} ";
     $result_cleaned_room_count = $conn->query($sql_cleaned_room_count);
 
 
-    $sql_complete_room_count = "SELECT COUNT(task_id) AS complete_rooms FROM task WHERE room_status = 'Ready' AND WEEK(start_date) = WEEK(NOW())";
+    $sql_complete_room_count = "SELECT COUNT(task_id) AS complete_rooms FROM task WHERE room_status = 'Ready' AND toilet_status = 'Ready' AND WEEK(start_date) = WEEK(NOW()) AND user_id = {$_SESSION['user_id']} ";
     $result_complete_room_count = $conn->query($sql_complete_room_count);
 
     $sql_floor_user = "SELECT t.floor_number, COUNT(*) AS floor_count
@@ -48,7 +48,7 @@ include 'includes/maid_navbar.php';
     INNER JOIN users u ON t.user_id = u.user_id
     WHERE WEEK(t.start_date) = WEEK(NOW()) AND u.user_id = {$_SESSION['user_id']} 
     GROUP BY t.floor_number
-    ORDER BY floor_count DESC";    
+    ORDER BY floor_count DESC";
     $result_floor_user = $conn->query($sql_floor_user);
 
 
@@ -210,6 +210,7 @@ include 'includes/maid_navbar.php';
                 <!-- Card Body -->
                 <div class="card-body">
                     <?php
+                    date_default_timezone_set('Asia/Bangkok');
                     $today = date("Y-m-d");  // วันที่ปัจจุบัน
                     $sql = "SELECT 
                 t.task_id,
@@ -229,7 +230,7 @@ include 'includes/maid_navbar.php';
             INNER JOIN users u ON t.user_id = u.user_id
             WHERE t.user_id = {$_SESSION['user_id']} AND t.start_date >= '$today'  -- เพิ่มเงื่อนไขเพื่อกรองวันที่เริ่มต้นหลังจากวันที่ปัจจุบัน
             ORDER BY t.start_date ASC";
-                    
+
                     $result = $conn->query($sql);
 
                     if ($result->num_rows > 0) {
