@@ -30,11 +30,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['user_id'] = $row['user_id'];
         $_SESSION['username'] = $row['username'];
         $_SESSION['full_name'] = $row['fullname'];
-        header("Location: main.php"); // Redirect to dashboard or profile page
+        
+        // Check user role
+        if ($row['role'] == 'maid') {
+            header("Location: maid.php"); // Redirect to maid page
+        } else {
+            header("Location: main.php"); // Redirect to dashboard or profile page
+        }
+        
         exit(); // Ensure no further code execution after redirection
     } else {
         // Invalid credentials
         echo "Invalid username or password";
     }
+
 }
 ?>
