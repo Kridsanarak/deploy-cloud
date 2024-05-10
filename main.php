@@ -248,7 +248,7 @@ include 'includes/calendar.php';
                         date_default_timezone_set('Asia/Bangkok');
                         $today = date('Y-m-d');
                         // $tomorrow = date('Y-m-d', strtotime('+1 day'));
-                        $sql = "SELECT * FROM task WHERE user_id = 2 AND start_date = '$today'";
+                        $sql = "SELECT * FROM task WHERE user_id = {$_SESSION['user_id']} AND start_date = '$today'";
                         $result = $conn->query($sql);
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {

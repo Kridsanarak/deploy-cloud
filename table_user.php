@@ -28,6 +28,7 @@ include 'includes/navbar.php';
         }
 
         // สร้างคำสั่ง SQL เพื่อดึงข้อมูล
+        $today = date("Y-m-d");
         $sql = "SELECT 
     t.task_id,
     t.task_title,
@@ -44,8 +45,9 @@ include 'includes/navbar.php';
     t.user_id
 FROM task t
 INNER JOIN users u ON t.user_id = u.user_id
-ORDER BY t.start_date ASC";  // เรียงตาม start_date จากน้อยไปหามาก
-        
+WHERE t.user_id = {$_SESSION['user_id']} AND t.start_date = '$today'
+ORDER BY t.start_date ASC";
+
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
@@ -56,7 +58,7 @@ ORDER BY t.start_date ASC";  // เรียงตาม start_date จากน
             echo '<tr>';
             echo '<th>Start Date</th>';
             echo '<th>Title</th>';
-            // echo '<th>Description</th>';
+            echo '<th>Description</th>';
             echo '<th>User</th>';
             echo '<th>Floor</th>';
             echo '<th>Type</th>';
@@ -71,7 +73,7 @@ ORDER BY t.start_date ASC";  // เรียงตาม start_date จากน
                 echo '<tr>';
                 echo '<td>' . ($row["start_date"] ?? '-') . '</td>';
                 echo '<td>' . ($row["task_title"] ?? '-') . '</td>';
-                // echo '<td>' . ($row["task_description"] ?? '-') . '</td>';
+                echo '<td>' . ($row["task_description"] ?? '-') . '</td>';
                 echo '<td>' . ($row["user_fullname"] ?? '-') . '</td>';
                 echo '<td>IF-' . ($row["floor_number"] ?? '-') . '0' . ($row["room_number"] ?? '-') . '</td>';
                 echo '<td>' . ($row["room_type"] ?? '-') . '</td>';
@@ -108,8 +110,8 @@ ORDER BY t.start_date ASC";  // เรียงตาม start_date จากน
                 }
                 echo '</td>';
                 echo '<td>';
-                // echo '<button type="button" class="btn btn-success btn-circle btn-sm" data-toggle="modal" data-target="#submitWorkModal' . $row["task_id"] . '"><i class="fas fa-paper-plane"></i></button>';
-                // echo '  ';
+                echo '<button type="button" class="btn btn-success btn-circle btn-sm" data-toggle="modal" data-target="#submitWorkModal' . $row["task_id"] . '"><i class="fas fa-paper-plane"></i></button>';
+                echo '  ';
                 echo '<button type="button" class="btn btn-info btn-circle btn-sm" data-toggle="modal" data-target="#imageModal' . $row["task_id"] . '"><i class="fas fa-image"></i></button>';
                 echo '</td>';
                 echo '</tr>';
@@ -155,9 +157,13 @@ ORDER BY t.start_date ASC";  // เรียงตาม start_date จากน
 
                 // เพิ่ม input field สำหรับอัปโหลดรูปภาพ
                 echo '<div class="form-group">';
-                echo '<label>Image</label>';
-                echo '<input type="file" name="image" class="form-control">';
+                echo '<label for="image">Image</label>';
+                echo '<div class="custom-file">';
+                echo '<input type="file" name="image" class="custom-file-input" id="image">';
+                echo '<label class="custom-file-label" for="image">Choose file</label>';
                 echo '</div>';
+                echo '</div>';
+
 
                 echo '</div>';
                 echo '<div class="modal-footer">';
@@ -203,10 +209,6 @@ ORDER BY t.start_date ASC";  // เรียงตาม start_date จากน
                 echo '</div>';
                 echo '</div>';
                 echo '</div>';
-
-
-
-
             }
             echo '</tbody>';
             echo '</table>';
@@ -238,27 +240,17 @@ ORDER BY t.start_date ASC";  // เรียงตาม start_date จากน
     <i class="fas fa-angle-up"></i>
 </a>
 
-<!-- Logout Modal-->
-<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                <a class="btn btn-primary" href="index.php">Logout</a>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script src="vendor/jquery/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // เมื่อมีการเลือกไฟล์
+        $('.custom-file-input').on('change', function() {
+            var fileName = $(this).val().split('\\').pop(); // ดึงชื่อไฟล์ออกมาจาก path
+            $(this).next('.custom-file-label').html(fileName); // แสดงชื่อไฟล์ใน label
+        });
+    });
+</script>
 
 <?php
 include 'includes/scripts.php';

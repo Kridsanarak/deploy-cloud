@@ -44,6 +44,6 @@ if (isset($_POST['submit_work_btn'])) {
 
     $connection->close(); // ปิดการเชื่อมต่อฐานข้อมูล
 
-    header('Location: tables.php'); // เปลี่ยนเส้นทางใหม่
+    header('Location: table_user.php'); // เปลี่ยนเส้นทางใหม่
 }
 ?>

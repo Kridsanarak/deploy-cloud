@@ -32,8 +32,6 @@
       <input class="button" type="submit" value="Login"><br>
     </form>
 
-    <!-- ... (ส่วนอื่นๆของ HTML) ... -->
-
     <script>
       function togglePassword() {
         var passwordField = document.getElementById("password");
@@ -52,47 +50,7 @@
         // ซ่อนข้อความ login fail เมื่อทำการ toggle password
         loginFailMessage.style.display = "none";
       }
-
-      document.addEventListener('DOMContentLoaded', function () {
-        var loginForm = document.querySelector('.login-form');
-        var loginFailMessage = document.getElementById("loginFailMessage");
-
-        loginForm.addEventListener('submit', function (event) {
-          event.preventDefault();
-
-          var formData = new FormData(loginForm);
-
-          fetch('includes/login.php', {
-            method: 'POST',
-            body: formData
-          })
-            .then(response => response.json())
-            .then(data => {
-              if (data.success) {
-                // Login สำเร็จ, ทำการ Redirect ไปยังหน้า main.php
-                window.location.href = 'main.php';
-              } else {
-                // Login ไม่สำเร็จ, แสดงข้อความ login fail และรีเซ็ตฟอร์ม
-                loginFailMessage.style.display = "block";
-                loginForm.reset();
-              }
-            })
-            .catch(error => {
-              console.error('เกิดข้อผิดพลาด:', error);
-            });
-        });
-      });
     </script>
-
-    <!-- ... (ส่วนอื่นๆของ HTML) ... -->
-
-    <div id="loginFailMessage" style="color: red; display: none; font-size:small;">
-      Login fail. Please check your username or password.
-    </div>
-
-    <!-- ... (ส่วนอื่นๆของ HTML) ... -->
-
-
   </div>
 </body>
 

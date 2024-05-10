@@ -146,6 +146,8 @@ include 'includes/navbar.php';
 
 </div>
 
+<script src="vendor/jquery/jquery.min.js"></script>
+
 <?php
 include 'includes/scripts.php';
 include 'includes/footer.php';
