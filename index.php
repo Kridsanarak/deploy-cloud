@@ -14,7 +14,7 @@
 
 <body>
   <div class="login-container">
-    <h2>ระบบจัดการอารคาร</h2>
+    <h2>ระบบจัดการอาคาร</h2>
     <h3>Login</h3>
     <form class="login-form" action="login.php" method="post">
       <label for="username">Username:</label>
@@ -46,10 +46,15 @@
           passwordIcon.classList.remove("fa-eye-slash");
           passwordIcon.classList.add("fa-eye");
         }
-
-        // ซ่อนข้อความ login fail เมื่อทำการ toggle password
-        loginFailMessage.style.display = "none";
       }
+
+      // Check for login failure and show popup
+      window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('login') === 'fail') {
+          alert('Invalid username or password');
+        }
+      };
     </script>
   </div>
 </body>

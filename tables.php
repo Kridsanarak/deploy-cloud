@@ -27,24 +27,27 @@ include 'includes/navbar.php';
             die("การเชื่อมต่อล้มเหลว: " . $conn->connect_error);
         }
 
-        // สร้างคำสั่ง SQL เพื่อดึงข้อมูล
+        // สร้างคำสั่ง SQL เพื่อดึงข้อมูลเฉพาะเดือนปัจจุบัน
+        $currentMonth = date('m');
+        $currentYear = date('Y');
         $sql = "SELECT 
-    t.task_id,
-    t.task_title,
-    t.start_date,
-    t.task_description,
-    u.fullname AS user_fullname,
-    t.floor_number,   
-    t.room_number,    
-    t.room_status,
-    t.room_type,    
-    t.toilet_gender,
-    t.toilet_status,
-    t.image,
-    t.user_id
-FROM task t
-INNER JOIN users u ON t.user_id = u.user_id
-ORDER BY t.start_date ASC";  // เรียงตาม start_date จากน้อยไปหามาก
+            t.task_id,
+            t.task_title,
+            t.start_date,
+            t.task_description,
+            u.fullname AS user_fullname,
+            t.floor_number,   
+            t.room_number,    
+            t.room_status,
+            t.room_type,    
+            t.toilet_gender,
+            t.toilet_status,
+            t.image,
+            t.user_id
+        FROM task t
+        INNER JOIN users u ON t.user_id = u.user_id
+        WHERE MONTH(t.start_date) = $currentMonth AND YEAR(t.start_date) = $currentYear
+        ORDER BY t.start_date ASC";  // เรียงตาม start_date จากน้อยไปหามาก
         
         $result = $conn->query($sql);
 
@@ -203,10 +206,6 @@ ORDER BY t.start_date ASC";  // เรียงตาม start_date จากน
                 echo '</div>';
                 echo '</div>';
                 echo '</div>';
-
-
-
-
             }
             echo '</tbody>';
             echo '</table>';
@@ -219,8 +218,6 @@ ORDER BY t.start_date ASC";  // เรียงตาม start_date จากน
         $conn->close();
         ?>
     </div>
-
-
 </div>
 <!-- /.container-fluid -->
 

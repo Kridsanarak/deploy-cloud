@@ -1,6 +1,6 @@
 <?php
 include 'includes/header.php';
-include 'includes/maid_navbar.php';
+include 'includes/headmaid_navbar.php';
 ?>
 
 <!-- Begin Page Content -->

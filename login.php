@@ -34,15 +34,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Check user role
         if ($row['role'] == 'maid') {
             header("Location: maid.php"); // Redirect to maid page
-        } else {
+        } else if ($row['role'] == 'admin'){
             header("Location: main.php"); // Redirect to dashboard or profile page
+        } else {
+            header("Location: headmaid.php");
         }
         
         exit(); // Ensure no further code execution after redirection
     } else {
         // Invalid credentials
-        echo "Invalid username or password";
+        header("Location: index.php?login=fail");
+        exit();
     }
-
 }
 ?>
