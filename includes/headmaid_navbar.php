@@ -20,7 +20,12 @@
         Interface
     </div>
 
-    <!-- Nav Item - Users -->
+    <li class="nav-item">
+        <a class="nav-link" href="headtask.php">
+            <i class="fas fa-fw fa-edit"></i>
+            <span>Work</span></a>
+
+        <!-- Nav Item - Users -->
     <li class="nav-item">
         <a class="nav-link" href="head_users.php">
             <i class="fas fa-fw fa-user"></i>
@@ -29,9 +34,15 @@
 
     <!-- Nav Item - Pages Collapse Menu -->
     <li class="nav-item">
-        <a class="nav-link" href="table_head.php">
+        <a class="nav-link" href="head_calendar.php">
             <i class="fas fa-fw fa-table"></i>
             <span>Work Schdule</span></a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="table_head.php">
+            <i class="far fa-check-circle"></i>
+            <span>Work Check</span></a>
     </li>
 
 

@@ -29,24 +29,29 @@ include 'includes/headmaid_navbar.php';
 
         // สร้างคำสั่ง SQL เพื่อดึงข้อมูล
         $today = date("Y-m-d");
+        $startOfWeek = date("Y-m-d", strtotime('monday this week'));
+        $endOfWeek = date("Y-m-d", strtotime('sunday this week'));
+
         $sql = "SELECT 
-            t.task_id,
-            t.task_title,
-            t.start_date,
-            t.task_description,
-            u.fullname AS user_fullname,
-            t.floor_number,   
-            t.room_number,    
-            t.room_status,
-            t.room_type,    
-            t.toilet_gender,
-            t.toilet_status,
-            t.image,
-            t.user_id
-        FROM task t
-        INNER JOIN users u ON t.user_id = u.user_id
-        WHERE t.user_id = {$_SESSION['user_id']} AND t.start_date = '$today'
-        ORDER BY t.start_date ASC";
+    t.task_id,
+    t.task_title,
+    t.start_date,
+    t.task_description,
+    u.fullname AS user_fullname,
+    u.role,  -- Include the 'role' column here
+    t.floor_number,   
+    t.room_number,    
+    t.room_status,
+    t.room_type,    
+    t.toilet_gender,
+    t.toilet_status,
+    t.image,
+    t.user_id
+FROM task t
+INNER JOIN users u ON t.user_id = u.user_id
+WHERE t.start_date BETWEEN '$startOfWeek' AND '$endOfWeek'
+ORDER BY t.start_date ASC";
+
 
         $result = $conn->query($sql);
 
@@ -112,6 +117,9 @@ include 'includes/headmaid_navbar.php';
                 echo '<td>';
                 if ($row["room_status"] == 'Ready' && $row["toilet_status"] == 'Ready') {
                     // ถ้า room_status และ toilet_status เป็น 'Ready' ทั้งคู่
+                    echo '<button type="button" class="btn btn-secondary btn-circle btn-sm" disabled><i class="fas fa-paper-plane"></i></button>';
+                } elseif ($row["role"] == 'maid' && $row["user_id"] != $_SESSION["user_id"]) {
+                    // ถ้าเป็นหัวหน้าและเป็นงานของตัวเอง
                     echo '<button type="button" class="btn btn-secondary btn-circle btn-sm" disabled><i class="fas fa-paper-plane"></i></button>';
                 } else {
                     // ถ้าไม่ใช่

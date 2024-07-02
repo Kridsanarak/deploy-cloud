@@ -41,15 +41,17 @@ include 'includes/navbar.php';
                                 <div class="form-group">
                                     <label> Role </label>
                                     <select name="role" class="form-control">
+                                    <option value="">--- Please select ---</option>
                                         <option value="admin">Admin</option>
-                                        <option value="maid">แม่บ้าน</option>
                                         <option value="headmaid">หัวหน้าแม่บ้าน</option>
+                                        <option value="maid">แม่บ้าน</option>
                                     </select>
                                 </div>
 
                                 <div class="form-group">
                                     <label>Status</label>
                                     <select name="status" class="form-control">
+                                    <option value="">--- Please select ---</option>
                                         <option value="พร้อม">พร้อม</option>
                                         <option value="ลา">ลา</option>
                                         <option value="ไม่พร้อม">ไม่พร้อม</option>
@@ -89,7 +91,7 @@ include 'includes/navbar.php';
         }
 
         // สร้างคำสั่ง SQL เพื่อดึงข้อมูล
-        $sql = "SELECT * FROM users WHERE user_id <> 1";
+        $sql = "SELECT * FROM users";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {

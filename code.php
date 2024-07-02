@@ -123,7 +123,7 @@ if (isset($_POST['add_task_btn'])) {
     $connection->close();
 
     // นำกลับไปยังหน้า tables.php
-    header('Location: tables.php');
+    header('Location: headmaid.php');
 
 }
 

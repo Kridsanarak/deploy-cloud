@@ -56,7 +56,6 @@ include 'includes/headmaid_navbar.php';
                 // เพิ่มปุ่ม edit user
                 echo '<td>
                 <button class="btn btn-primary btn-circle btn-sm mr-1" data-toggle="modal" data-target="#editadminprofile' . $row["user_id"] . '"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-danger btn-circle btn-sm" onclick="deleteUser(' . $row["user_id"] . ')"><i class="fas fa-trash"></i></button>
                 </td>';
                 echo '</tr>';
 
