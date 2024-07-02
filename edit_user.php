@@ -16,7 +16,7 @@ if (isset($_POST['edit_user_btn'])) {
     $userId = $_POST['user_id'];
     $fullname = $_POST['fullname'];
     $username = $_POST['username'];
-    $password = $_POST['password'];
+    $password = sha1($_POST['password']);
     $role = $_POST['role'];
     $status = $_POST['status'];
 

@@ -212,7 +212,9 @@ include 'includes/navbar.php';
             echo '</div>';
             echo '</div>';
         } else {
-            echo "0 ผลลัพธ์";
+            echo "<div class='card-body'>";
+            echo "<p class='text-center'>You have no tasks scheduled for today.</p>";
+            echo "</div>";
         }
         // ปิดการเชื่อมต่อกับฐานข้อมูล
         $conn->close();

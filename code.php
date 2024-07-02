@@ -2,8 +2,8 @@
 
 session_start();
 
-// ตรวจสอบว่ามีการกำหนดค่าใน $_POST['registerbtn'] หรือไม่
-if(isset($_POST['registerbtn'])) {
+// Handle user registration
+if (isset($_POST['registerbtn'])) {
     // เชื่อมต่อฐานข้อมูล
     $servername = "localhost";
     $username = "root";
@@ -20,14 +20,14 @@ if(isset($_POST['registerbtn'])) {
     // รับค่าจากฟอร์ม
     $fullname = $_POST['fullname'];
     $username = $_POST['username'];
-    $password = $_POST['password'];
+    $password = sha1($_POST['password']); // Hash the password using SHA-1
     $role = $_POST['role'];
 
     // คำสั่ง SQL เพื่อเพิ่มข้อมูลผู้ใช้
     $query = "INSERT INTO users (fullname, username, password, role) VALUES ('$fullname', '$username', '$password', '$role')";
 
     // ทำการ query คำสั่ง SQL
-    if(mysqli_query($connection, $query)) {
+    if (mysqli_query($connection, $query)) {
         $_SESSION['status'] = "User added successfully!";
         $_SESSION['status_code'] = "success";
     } else {

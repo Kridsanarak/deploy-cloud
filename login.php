@@ -15,7 +15,7 @@ if ($conn->connect_error) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
-    $password = $_POST['password'];
+    $password = sha1($_POST['password']);
 
     // Validate user credentials
     $sql = "SELECT user_id, username, fullname, role FROM users WHERE username = ? AND password = ?";
