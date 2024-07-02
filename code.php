@@ -42,7 +42,8 @@ if(isset($_POST['registerbtn'])) {
     header('Location: users.php');
 }
 
-if(isset($_POST['deleteUserId'])) {
+// Handle user deletion
+if (isset($_POST['deleteUserId'])) {
     $servername = "localhost";
     $username = "root";
     $password = "";
@@ -55,19 +56,33 @@ if(isset($_POST['deleteUserId'])) {
         die("การเชื่อมต่อล้มเหลว: " . $connection->connect_error);
     }
     $userId = $_POST['deleteUserId'];
-    
-    // สร้างคำสั่ง SQL เพื่อลบผู้ใช้งาน
-    $sql = "DELETE FROM users WHERE user_id=$userId";
 
-    if ($connection->query($sql) === TRUE) {
-        // กระทำหลังจากลบผู้ใช้งานสำเร็จ
-        // ทำการ reset AUTO_INCREMENT
-        $connection->query("ALTER TABLE users AUTO_INCREMENT = 1");
+    // First, delete all tasks related to this user
+    $deleteTasksQuery = "DELETE FROM task WHERE user_id=$userId";
+    if ($connection->query($deleteTasksQuery) === TRUE) {
+        // If task deletion is successful, delete the user
+        $deleteUserQuery = "DELETE FROM users WHERE user_id=$userId";
+        if ($connection->query($deleteUserQuery) === TRUE) {
+            // กระทำหลังจากลบผู้ใช้งานสำเร็จ
+            // ทำการ reset AUTO_INCREMENT
+            $connection->query("ALTER TABLE users AUTO_INCREMENT = 1");
 
-        echo "User deleted successfully";
+            $_SESSION['status'] = "User deleted successfully!";
+            $_SESSION['status_code'] = "success";
+        } else {
+            $_SESSION['status'] = "Error deleting user: " . $connection->error;
+            $_SESSION['status_code'] = "error";
+        }
     } else {
-        echo "Error deleting user: " . $connection->error;
+        $_SESSION['status'] = "Error deleting tasks: " . $connection->error;
+        $_SESSION['status_code'] = "error";
     }
+
+    // ปิดการเชื่อมต่อ
+    $connection->close();
+
+    // นำกลับไปยังหน้า users.php
+    header('Location: users.php');
 }
 
 if (isset($_POST['add_task_btn'])) {

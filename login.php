@@ -30,14 +30,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['user_id'] = $row['user_id'];
         $_SESSION['username'] = $row['username'];
         $_SESSION['full_name'] = $row['fullname'];
-        
-        // Check user role
+
+        // Update lasttime_login field
+        $userId = $row['user_id'];
+        $currentTime = date('Y-m-d H:i:s'); // Get current date and time
+        $updateSql = "UPDATE users SET lasttime_login = ? WHERE user_id = ?";
+        $updateStmt = $conn->prepare($updateSql);
+        $updateStmt->bind_param("si", $currentTime, $userId);
+        $updateStmt->execute();
+
+        // Check user role and redirect accordingly
         if ($row['role'] == 'maid') {
             header("Location: maid.php"); // Redirect to maid page
         } else if ($row['role'] == 'admin'){
             header("Location: main.php"); // Redirect to dashboard or profile page
         } else {
-            header("Location: headmaid.php");
+            header("Location: headmaid.php"); // Redirect to head maid page
         }
         
         exit(); // Ensure no further code execution after redirection

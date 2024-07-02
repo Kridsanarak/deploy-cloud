@@ -118,12 +118,14 @@ include 'includes/navbar.php';
                 echo '<td>' . $row["lasttime_login"] . '</td>';
                 echo '<td>' . $row["status"] . '</td>';
                 // เพิ่มปุ่ม edit user
+                // Inside the while loop where you generate the table rows
                 echo '<td>
-                <button class="btn btn-primary btn-circle btn-sm mr-1" data-toggle="modal" data-target="#editadminprofile' . $row["user_id"] . '"><i class="fas fa-edit"></i></button>
-                <button class="btn btn-danger btn-circle btn-sm" onclick="deleteUser(' . $row["user_id"] . ')"><i class="fas fa-trash"></i></button>
+                    <button class="btn btn-primary btn-circle btn-sm mr-1" data-toggle="modal" data-target="#editadminprofile' . $row["user_id"] . '"><i class="fas fa-edit"></i></button>
+                    <form action="code.php" method="POST" style="display:inline;">
+                    <input type="hidden" name="deleteUserId" value="' . $row["user_id"] . '">
+                    <button type="submit" class="btn btn-danger btn-circle btn-sm" onclick="return confirm(\'Are you sure you want to delete this user?\')"><i class="fas fa-trash"></i></button>
+                    </form>
                 </td>';
-                echo '</tr>';
-
                 // เพิ่มโมดัลเชียลแก้ไขผู้ใช้ (edit user modal) ด้วย ID ที่ไม่ซ้ำกันตาม user_id
                 echo '<div class="modal fade" id="editadminprofile' . $row["user_id"] . '" tabindex="-1" role="dialog" aria-labelledby="editAdminProfileLabel' . $row["user_id"] . '" aria-hidden="true">';
                 echo '<div class="modal-dialog" role="document">';
