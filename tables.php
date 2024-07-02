@@ -1,6 +1,28 @@
 <?php
+session_start();
 include 'includes/header.php';
-include 'includes/navbar.php';
+
+// ตรวจสอบบทบาทของผู้ใช้
+if (!isset($_SESSION['role'])) {
+    echo "ไม่สามารถระบุบทบาทของผู้ใช้ได้";
+    exit;
+}
+
+// กำหนดค่าตัวแปร $role จาก Session
+$role = $_SESSION['role'];
+
+// เลือก Navbar ตามบทบาทของผู้ใช้
+if ($role == 'admin') {
+    include 'includes/navbar.php';
+} elseif ($role == 'headmaid') {
+    include 'includes/headmaid_navbar.php';
+} elseif ($role == 'maid') {
+    include 'includes/maid_navbar.php';
+} else {
+    echo "ไม่สามารถระบุบทบาทของผู้ใช้ได้";
+    exit;
+}
+include 'includes/calendar.php';
 ?>
 
 <!-- Begin Page Content -->

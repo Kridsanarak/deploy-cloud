@@ -52,7 +52,7 @@ include 'includes/calendar.php';
                             die("Connection failed: " . $conn->connect_error);
                         }
                         // SQL query to retrieve all users except user_id 1
-                        $sql = "SELECT * FROM users WHERE user_id <> 1 AND status = 'พร้อม'" ;
+                        $sql = "SELECT * FROM users WHERE role != 'admin' AND status = 'พร้อม'" ;
                         $result = mysqli_query($conn, $sql);
                         // Loop through all users and display as options
                         while ($row = mysqli_fetch_assoc($result)) {
@@ -144,6 +144,7 @@ include 'includes/calendar.php';
                         <option value="">--- Please select ---</option>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
+                        <option value="Both">Both</option>
                     </select>
                 </div>
 

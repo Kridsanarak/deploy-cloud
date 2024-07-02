@@ -49,7 +49,7 @@ include 'includes/calendar.php';
         }
 
         // สร้างคำสั่ง SQL เพื่อดึงข้อมูล
-        $sql = "SELECT * FROM users WHERE user_id <> 1";
+        $sql = "SELECT * FROM users WHERE role != 'admin'";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {

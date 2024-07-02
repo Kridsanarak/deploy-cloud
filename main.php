@@ -264,7 +264,7 @@ include 'includes/calendar.php';
                             }
                         </style>
 
-                        <?php
+<?php
                         // สร้างคำสั่ง SQL เพื่อดึงข้อมูล
                         date_default_timezone_set('Asia/Bangkok');
                         $today = date('Y-m-d');
@@ -277,14 +277,20 @@ include 'includes/calendar.php';
                                 echo '<div class="card-header" id="heading' . $row["task_id"] . '">';
                                 echo '<h2 class="mb-0">';
                                 echo '<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse' . $row["task_id"] . '" aria-expanded="true" aria-controls="collapse' . $row["task_id"] . '">';
-                                echo $row["task_title"];
+                                $status_icon = '';
+                                if ($row["room_status"] == 'Ready' && $row["toilet_status"] == 'Ready') {
+                                    $status_icon = '<i class="fas fa-check-circle text-success"></i>'; // Green check square icon
+                                } else {
+                                    $status_icon = '<i class="fas fa-exclamation-circle text-danger"></i>'; // Red square icon
+                                }
+                                echo "IF-" . $row["floor_number"] . '0' . $row["room_number"] . ' - ' . $row["task_title"] . ' ' . $status_icon;
                                 echo '</button>';
                                 echo '</h2>';
                                 echo '</div>';
                                 echo '<div id="collapse' . $row["task_id"] . '" class="collapse" aria-labelledby="heading' . $row["task_id"] . '" data-parent="#taskAccordion">';
                                 echo '<div class="card-body">';
                                 echo '<p>';
-                                echo 'รายละเอียด: ' . $row["task_description"] . '<br>';
+                                echo 'รายละเอียด:<br>';
                                 echo 'เริ่ม: ' . $row["start_date"] . '<br>';
                                 echo 'ชั้น: ' . $row["floor_number"] . '<br>';
                                 echo 'ห้อง: ' . $row["room_number"] . '<br>';

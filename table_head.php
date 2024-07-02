@@ -110,7 +110,7 @@ ORDER BY t.start_date ASC";
                 } elseif ($row["room_status"] == 'Not Ready') {
                     echo 'ไม่พร้อม';
                 } elseif ($row["room_status"] == 'Waiting') {
-                    echo 'รอ';
+                    echo 'รอทำความสะอาด';
                 } else {
                     echo ($row["room_status"] ?? '-');
                 }
@@ -131,7 +131,7 @@ ORDER BY t.start_date ASC";
                 } elseif ($row["toilet_status"] == 'Not Ready') {
                     echo 'ไม่พร้อม';
                 } elseif ($row["toilet_status"] == 'Waiting') {
-                    echo 'รอ';
+                    echo 'รอทำความสะอาด';
                 } else {
                     echo ($row["toilet_status"] ?? '-');
                 }
