@@ -30,6 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['user_id'] = $row['user_id'];
         $_SESSION['username'] = $row['username'];
         $_SESSION['full_name'] = $row['fullname'];
+        $_SESSION['role'] = $row['role']; // เพิ่ม session role ที่เก็บค่าบทบาทของผู้ใช้
 
         // Update lasttime_login field
         $userId = $row['user_id'];
@@ -39,20 +40,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $updateStmt->bind_param("si", $currentTime, $userId);
         $updateStmt->execute();
 
-        // Check user role and redirect accordingly
-        if ($row['role'] == 'maid') {
-            header("Location: maid.php"); // Redirect to maid page
-        } else if ($row['role'] == 'admin'){
-            header("Location: main.php"); // Redirect to dashboard or profile page
-        } else {
-            header("Location: headmaid.php"); // Redirect to head maid page
-        }
-        
+        // Redirect to main.php after successful login
+        header("Location: main.php");
         exit(); // Ensure no further code execution after redirection
     } else {
         // Invalid credentials
         header("Location: index.php?login=fail");
         exit();
     }
+
 }
 ?>
+'
