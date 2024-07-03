@@ -106,20 +106,22 @@ ORDER BY t.start_date ASC";
                 echo '<td>' . ($row["room_type"] ?? '-') . '</td>';
                 echo '<td>';
                 if ($row["room_status"] == 'Ready') {
-                    echo 'พร้อม';
+                    echo 'Ready';
                 } elseif ($row["room_status"] == 'Not Ready') {
-                    echo 'ไม่พร้อม';
+                    echo 'Not Ready';
                 } elseif ($row["room_status"] == 'Waiting') {
-                    echo 'รอทำความสะอาด';
+                    echo 'Waiting';
                 } else {
                     echo ($row["room_status"] ?? '-');
                 }
                 echo '</td>';
                 echo '<td>';
                 if ($row["toilet_gender"] == 'male') {
-                    echo 'ชาย';
+                    echo 'Male';
                 } elseif ($row["toilet_gender"] == 'female') {
-                    echo 'หญิง';
+                    echo 'Female';
+                } elseif ($row["toilet_gender"] == 'both') {
+                    echo 'Both';
                 } else {
                     echo ($row["toilet_gender"] ?? '-');
                 }
@@ -127,11 +129,11 @@ ORDER BY t.start_date ASC";
 
                 echo '<td>';
                 if ($row["toilet_status"] == 'Ready') {
-                    echo 'พร้อม';
+                    echo 'Ready';
                 } elseif ($row["toilet_status"] == 'Not Ready') {
-                    echo 'ไม่พร้อม';
+                    echo 'Not Ready';
                 } elseif ($row["toilet_status"] == 'Waiting') {
-                    echo 'รอทำความสะอาด';
+                    echo 'Waiting';
                 } else {
                     echo ($row["toilet_status"] ?? '-');
                 }

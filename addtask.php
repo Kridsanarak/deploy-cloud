@@ -120,9 +120,9 @@ include 'includes/calendar.php';
                     <label> Room Type </label>
                     <select name="room_type" class="form-control" required>
                         <option value="">--- Please select ---</option>
-                        <option value="lecture">lecture</option>
-                        <option value="meeting">meeting</option>
-                        <option value="lab">lab</option>
+                        <option value="Lecture">Lecture</option>
+                        <option value="Meeting">Meeting</option>
+                        <option value="Lab">Lab</option>
                     </select>
                 </div>
 

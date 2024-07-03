@@ -264,7 +264,7 @@ include 'includes/calendar.php';
                             }
                         </style>
 
-<?php
+                        <?php
                         // สร้างคำสั่ง SQL เพื่อดึงข้อมูล
                         date_default_timezone_set('Asia/Bangkok');
                         $today = date('Y-m-d');
@@ -290,46 +290,46 @@ include 'includes/calendar.php';
                                 echo '<div id="collapse' . $row["task_id"] . '" class="collapse" aria-labelledby="heading' . $row["task_id"] . '" data-parent="#taskAccordion">';
                                 echo '<div class="card-body">';
                                 echo '<p>';
-                                echo 'รายละเอียด:<br>';
-                                echo 'เริ่ม: ' . $row["start_date"] . '<br>';
-                                echo 'ชั้น: ' . $row["floor_number"] . '<br>';
-                                echo 'ห้อง: ' . $row["room_number"] . '<br>';
-                                echo 'สถานะ: ';
+                                echo 'Detail:<br>';
+                                echo 'Start: ' . $row["start_date"] . '<br>';
+                                echo 'Floor: ' . $row["floor_number"] . '<br>';
+                                echo 'Room: ' . $row["room_number"] . '<br>';
+                                echo 'Room Status: ';
                                 switch ($row["room_status"]) {
                                     case 'Ready':
-                                        echo 'พร้อม';
+                                        echo 'Ready';
                                         break;
                                     case 'Not Ready':
-                                        echo 'ไม่พร้อม';
+                                        echo 'Not Ready';
                                         break;
                                     case 'Waiting':
-                                        echo 'รอทำความสะอาด';
+                                        echo 'Waiting';
                                         break;
                                     default:
                                         echo $row["room_status"];
                                         break;
                                 }
                                 echo '<br>';
-                                echo 'ประเภท: ' . $row["room_type"] . '<br>';
-                                echo 'ห้องน้ำ: ';
+                                echo 'Type: ' . $row["room_type"] . '<br>';
+                                echo 'Toilet: ';
                                 if ($row["toilet_gender"] == 'male') {
-                                    echo 'ชาย';
+                                    echo 'Male';
                                 } elseif ($row["toilet_gender"] == 'female') {
-                                    echo 'หญิง';
-                                } else {
-                                    echo $row["toilet_gender"];
+                                    echo 'Female';
+                                } elseif ($row["toilet_gender"] == 'both') {
+                                    echo 'Both';
                                 }
                                 echo '<br>';
-                                echo 'สถานะ: ';
+                                echo 'Toilet Status: ';
                                 switch ($row["toilet_status"]) {
                                     case 'Ready':
-                                        echo 'ทำความสะอาดแล้ว';
+                                        echo 'Ready';
                                         break;
                                     case 'Not Ready':
-                                        echo 'ไม่พร้อม';
+                                        echo 'Not Ready';
                                         break;
                                     case 'Waiting':
-                                        echo 'รอทำความสะอาด';
+                                        echo 'Waiting';
                                         break;
                                     default:
                                         echo $row["toilet_status"];

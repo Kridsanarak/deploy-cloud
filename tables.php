@@ -81,7 +81,7 @@ include 'includes/calendar.php';
             echo '<tr>';
             echo '<th>Start Date</th>';
             echo '<th>Title</th>';
-            // echo '<th>Description</th>';
+            echo '<th>Description</th>';
             echo '<th>User</th>';
             echo '<th>Floor</th>';
             echo '<th>Type</th>';
@@ -96,26 +96,28 @@ include 'includes/calendar.php';
                 echo '<tr>';
                 echo '<td>' . ($row["start_date"] ?? '-') . '</td>';
                 echo '<td>' . ($row["task_title"] ?? '-') . '</td>';
-                // echo '<td>' . ($row["task_description"] ?? '-') . '</td>';
+                echo '<td>' . ($row["task_description"] ?? '-') . '</td>';
                 echo '<td>' . ($row["user_fullname"] ?? '-') . '</td>';
                 echo '<td>IF-' . ($row["floor_number"] ?? '-') . '0' . ($row["room_number"] ?? '-') . '</td>';
                 echo '<td>' . ($row["room_type"] ?? '-') . '</td>';
                 echo '<td>';
                 if ($row["room_status"] == 'Ready') {
-                    echo 'พร้อม';
+                    echo 'Ready';
                 } elseif ($row["room_status"] == 'Not Ready') {
-                    echo 'ไม่พร้อม';
+                    echo 'Not Ready';
                 } elseif ($row["room_status"] == 'Waiting') {
-                    echo 'รอ';
+                    echo 'Waiting';
                 } else {
                     echo ($row["room_status"] ?? '-');
                 }
                 echo '</td>';
                 echo '<td>';
                 if ($row["toilet_gender"] == 'male') {
-                    echo 'ชาย';
+                    echo 'Male';
                 } elseif ($row["toilet_gender"] == 'female') {
-                    echo 'หญิง';
+                    echo 'Female';
+                } elseif ($row["toilet_gender"] == 'both') {
+                    echo 'Both';
                 } else {
                     echo ($row["toilet_gender"] ?? '-');
                 }
@@ -123,11 +125,11 @@ include 'includes/calendar.php';
 
                 echo '<td>';
                 if ($row["toilet_status"] == 'Ready') {
-                    echo 'พร้อม';
+                    echo 'Ready';
                 } elseif ($row["toilet_status"] == 'Not Ready') {
-                    echo 'ไม่พร้อม';
+                    echo 'Not Ready';
                 } elseif ($row["toilet_status"] == 'Waiting') {
-                    echo 'รอ';
+                    echo 'Waiting';
                 } else {
                     echo ($row["toilet_status"] ?? '-');
                 }
