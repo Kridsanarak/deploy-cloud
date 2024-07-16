@@ -58,6 +58,7 @@ include 'includes/calendar.php';
     t.task_id,
     t.task_title,
     t.start_date,
+    t.end_date,
     t.task_description,
     u.fullname AS user_fullname,
     u.role,  -- Include the 'role' column here
@@ -84,6 +85,7 @@ ORDER BY t.start_date ASC";
             echo '<thead>';
             echo '<tr>';
             echo '<th>Start Date</th>';
+            echo '<th>End Date</th>';
             echo '<th>Title</th>';
             echo '<th>Description</th>';
             echo '<th>User</th>';
@@ -99,6 +101,7 @@ ORDER BY t.start_date ASC";
             while ($row = $result->fetch_assoc()) {
                 echo '<tr>';
                 echo '<td>' . ($row["start_date"] ?? '-') . '</td>';
+                echo '<td>' . ($row["end_date"] ?? '-') . '</td>';
                 echo '<td>' . ($row["task_title"] ?? '-') . '</td>';
                 echo '<td>' . ($row["task_description"] ?? '-') . '</td>';
                 echo '<td>' . ($row["user_fullname"] ?? '-') . '</td>';

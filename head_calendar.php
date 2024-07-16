@@ -99,6 +99,7 @@ include 'includes/calendar.php';
                 t.task_id,
                 t.task_title,
                 t.start_date,
+                t.end_date,
                 t.task_description,
                 u.fullname AS user_fullname,
                 t.floor_number,   
@@ -123,6 +124,7 @@ include 'includes/calendar.php';
                         echo '<thead>';
                         echo '<tr>';
                         echo '<th>Start Date</th>';
+                        echo '<th>End Date</th>';
                         echo '<th>Task</th>';
                         echo '<th>Floor</th>';
                         echo '<th>Type</th>';
@@ -132,6 +134,7 @@ include 'includes/calendar.php';
                         while ($row = $result->fetch_assoc()) {
                             echo '<tr>';
                             echo '<td>' . ($row["start_date"] ?? '-') . '</td>';
+                            echo '<td>' . ($row["end_date"] ?? '-') . '</td>';
                             echo '<td>' . ($row["task_title"] ?? '-') . '</td>';
                             echo '<td>IF-' . ($row["floor_number"] ?? '-') . '0' . ($row["room_number"] ?? '-') . '</td>';
                             echo '<td>' . ($row["room_type"] ?? '-') . '</td>';
@@ -225,6 +228,7 @@ include 'includes/calendar.php';
                                 echo '<p>';
                                 echo 'รายละเอียด:<br>';
                                 echo 'เริ่ม: ' . $row["start_date"] . '<br>';
+                                echo 'สิ้นสุด: ' . $row["end_date"] . '<br>';
                                 echo 'ชั้น: ' . $row["floor_number"] . '<br>';
                                 echo 'ห้อง: ' . $row["room_number"] . '<br>';
                                 echo 'สถานะ: ';

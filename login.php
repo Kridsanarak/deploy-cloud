@@ -34,7 +34,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Update lasttime_login field
         $userId = $row['user_id'];
-        $currentTime = date('Y-m-d H:i:s'); // Get current date and time
+        $dateTime = new DateTime("now", new DateTimeZone('Asia/Bangkok')); // Create DateTime object with Asia/Bangkok timezone
+        $currentTime = $dateTime->format('Y-m-d H:i:s'); // Get current date and time in specified format
         $updateSql = "UPDATE users SET lasttime_login = ? WHERE user_id = ?";
         $updateStmt = $conn->prepare($updateSql);
         $updateStmt->bind_param("si", $currentTime, $userId);
@@ -51,4 +52,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 }
 ?>
-'

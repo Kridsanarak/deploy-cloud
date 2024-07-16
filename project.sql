@@ -47,10 +47,10 @@ CREATE TABLE `task` (
 --
 
 INSERT INTO `task` (`task_id`, `task_title`, `task_description`, `start_date`, `user_id`, `floor_number`, `room_number`, `room_status`, `room_type`, `toilet_gender`, `toilet_status`, `image`) VALUES
-(1, '3', '2', '2024-07-02', 2, '4', '2', 'Waiting', '', 'female', 'Ready', NULL),
-(2, '1', '1', '2024-07-03', 3, '8', '2', 'Ready', '', 'male', 'Waiting', NULL),
-(3, '2', 'กกก', '2024-07-06', 3, '6', '3', 'Ready', '', 'female', 'Ready', NULL),
-(4, '4', 'qwe', '2024-07-04', 3, '8', '3', 'Waiting', '', 'male', 'Waiting', NULL);
+(1, '3', '2', '2024-07-16', 2, '4', '2', 'Waiting', '', 'female', 'Ready', NULL),
+(2, '1', '1', '2024-07-16', 3, '8', '2', 'Ready', '', 'male', 'Waiting', NULL),
+(3, '2', 'กกก', '2024-07-16', 3, '6', '3', 'Ready', '', 'female', 'Ready', NULL),
+(4, '4', 'qwe', '2024-07-16', 3, '8', '3', 'Waiting', '', 'male', 'Waiting', NULL);
 
 -- --------------------------------------------------------
 

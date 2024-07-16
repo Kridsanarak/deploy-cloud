@@ -82,6 +82,15 @@ include 'includes/calendar.php';
                     <input type="date" name="start_date" class="form-control" required placeholder="Enter Start Date"
                         min="<?php
                         date_default_timezone_set('Asia/Bangkok');
+                        echo date('Y-m-d'); ?>">
+                </div>
+
+                <!-- End Date -->
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="date" name="end_date" class="form-control" required placeholder="Enter End Date"
+                        min="<?php
+                        date_default_timezone_set('Asia/Bangkok');
                         echo date('Y-m-d', strtotime('+1 day')); ?>">
                 </div>
 

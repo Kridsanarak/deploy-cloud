@@ -96,10 +96,12 @@ if (isset($_POST['add_task_btn'])) {
     if ($connection->connect_error) {
         die("Connection failed: " . $connection->connect_error);
     }
+
     $user_id = $_POST['user_id'];
     $task_title = $_POST['task_title'];
     $task_description = $_POST['task_description'];
     $start_date = $_POST['start_date'];
+    $end_date = $_POST['end_date'];
     $floor_number = $_POST['floor_number'];
     $room_number = $_POST['room_number'];
     $room_status = $_POST['room_status'];
@@ -107,24 +109,36 @@ if (isset($_POST['add_task_btn'])) {
     $toilet_gender = $_POST['toilet_gender'];
     $toilet_status = $_POST['toilet_status'];
 
-    // คำสั่ง SQL เพื่อเพิ่มข้อมูลงาน
-    $query = "INSERT INTO task (user_id, task_title, task_description, start_date, floor_number, room_number, room_status, room_type, toilet_gender, toilet_status) 
-              VALUES ('$user_id', '$task_title', '$task_description', '$start_date', '$floor_number', '$room_number', '$room_status', '$room_type', '$toilet_gender', '$toilet_status')";
-    // ทำการ query คำสั่ง SQL
-    if (mysqli_query($connection, $query)) {
-        $_SESSION['status'] = "Task added successfully!";
-        $_SESSION['status_code'] = "success";
-    } else {
-        $_SESSION['status'] = "Failed to add task";
-        $_SESSION['status_code'] = "error";
+    // Convert start and end dates to DateTime objects
+    $start = new DateTime($start_date);
+    $end = new DateTime($end_date);
+    $end = $end->modify('+1 day'); // include end date in the period
+
+    // Create a DatePeriod with 1 day intervals
+    $interval = new DateInterval('P1D');
+    $period = new DatePeriod($start, $interval, $end);
+
+    foreach ($period as $date) {
+        $current_date = $date->format('Y-m-d');
+
+        // Insert task for each date in the range
+        $query = "INSERT INTO task (user_id, task_title, task_description, start_date, end_date, floor_number, room_number, room_status, room_type, toilet_gender, toilet_status) 
+                  VALUES ('$user_id', '$task_title', '$task_description', '$current_date', '$current_date', '$floor_number', '$room_number', '$room_status', '$room_type', '$toilet_gender', '$toilet_status')";
+        
+        if (mysqli_query($connection, $query)) {
+            $_SESSION['status'] = "Task added successfully!";
+            $_SESSION['status_code'] = "success";
+        } else {
+            $_SESSION['status'] = "Failed to add task";
+            $_SESSION['status_code'] = "error";
+        }
     }
 
-    // ปิดการเชื่อมต่อ
+    // Close connection
     $connection->close();
 
-    // นำกลับไปยังหน้า tables.php
+    // Redirect back to main page
     header('Location: main.php');
-
 }
 
 ?>
