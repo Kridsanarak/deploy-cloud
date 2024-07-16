@@ -51,6 +51,11 @@ include 'includes/calendar.php';
 
         // สร้างคำสั่ง SQL เพื่อดึงข้อมูล
         $today = date("Y-m-d");
+        $startOfWeek = date("Y-m-d", strtotime('monday this week'));
+        $endOfWeek = date("Y-m-d", strtotime('sunday this week'));
+
+        // สร้างคำสั่ง SQL เพื่อดึงข้อมูล
+        $today = date("Y-m-d");
         $sql = "SELECT 
             t.task_id,
             t.task_title,
@@ -68,7 +73,7 @@ include 'includes/calendar.php';
             t.user_id
         FROM task t
         INNER JOIN users u ON t.user_id = u.user_id
-        WHERE t.user_id = {$_SESSION['user_id']} AND t.start_date = '$today'
+        WHERE t.user_id = {$_SESSION['user_id']} AND t.start_date BETWEEN '$startOfWeek' AND '$endOfWeek'
         ORDER BY t.start_date ASC";
 
         $result = $conn->query($sql);
@@ -137,8 +142,8 @@ include 'includes/calendar.php';
                 }
                 echo '</td>';
                 echo '<td>';
-                if ($row["room_status"] == 'Ready' && $row["toilet_status"] == 'Ready') {
-                    // ถ้า room_status และ toilet_status เป็น 'Ready' ทั้งคู่
+                if ($row["room_status"] == 'Ready' && $row["toilet_status"] == 'Ready' || $row["start_date"] != $today) {
+                    // ถ้า room_status และ toilet_status เป็น 'Ready' ทั้งคู่ หรือ start_date เท่ากับวันนี้
                     echo '<button type="button" class="btn btn-secondary btn-circle btn-sm" disabled><i class="fas fa-paper-plane"></i></button>';
                 } else {
                     // ถ้าไม่ใช่
