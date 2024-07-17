@@ -6,7 +6,7 @@
         <div class="sidebar-brand-icon rotate-n-15">
             <i class="fas fa-laugh-wink"></i>
         </div>
-        <div class="sidebar-brand-text mx-2" style="font-family: Prompt;">ระบบจัดการอาคาร</div>
+        <div class="sidebar-brand-text mx-2" style="font-family: Prompt;">ระบบจัดการแม่บ้าน</div>
     </a>
     <!-- SB Admin <sup>2</sup> -->
     <!-- Divider -->

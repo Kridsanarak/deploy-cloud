@@ -4,7 +4,14 @@ include 'includes/header.php';
 
 // ตรวจสอบบทบาทของผู้ใช้
 if (!isset($_SESSION['role'])) {
-    echo "ไม่สามารถระบุบทบาทของผู้ใช้ได้";
+    echo "
+    <script type='text/javascript'>
+        alert('ไม่สามารถระบุบทบาทของผู้ใช้ได้');
+        setTimeout(function() {
+            window.location.href = 'index.php';
+        }, 100);
+    </script>
+    ";
     exit;
 }
 
