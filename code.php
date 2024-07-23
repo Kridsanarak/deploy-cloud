@@ -107,6 +107,7 @@ if (isset($_POST['add_task_btn'])) {
         die("Connection failed: " . $connection->connect_error);
     }
 
+    
     $user_id = $_POST['user_id'];
     $start_date = $_POST['start_date'];
     $end_date = $_POST['end_date'];
