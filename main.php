@@ -3,7 +3,7 @@ session_start();
 include 'includes/header.php';
 
 // ตรวจสอบบทบาทของผู้ใช้
-if (!isset($_SESSION['role'])) {
+if (!isset($_SESSION['role_id'])) {
     echo "
     <script type='text/javascript'>
         alert('ไม่สามารถระบุบทบาทของผู้ใช้ได้');
@@ -15,15 +15,15 @@ if (!isset($_SESSION['role'])) {
     exit;
 }
 
-// กำหนดค่าตัวแปร $role จาก Session
-$role = $_SESSION['role'];
+// กำหนดค่าตัวแปร $role_id จาก Session
+$role_id = $_SESSION['role_id'];
 
 // เลือก Navbar ตามบทบาทของผู้ใช้
-if ($role == 'admin') {
+if ($role_id == '1') {
     include 'includes/navbar.php';
-} elseif ($role == 'headmaid') {
+} elseif ($role_id == '2') {
     include 'includes/headmaid_navbar.php';
-} elseif ($role == 'maid') {
+} elseif ($role_id == '3') {
     include 'includes/maid_navbar.php';
 } else {
     echo "ไม่สามารถระบุบทบาทของผู้ใช้ได้";
@@ -42,55 +42,60 @@ include 'includes/calendar.php';
 
     <!-- Content Row -->
     <?php
-    // การกำหนดค่าในการเชื่อมต่อฐานข้อมูล
+
     $servername = "localhost";
     $username = "root";
     $password = "";
     $dbname = "project";
 
-    // การเชื่อมต่อกับ MySQL
+    // Establishing connection to MySQL
     $conn = new mysqli($servername, $username, $password, $dbname);
 
-    // ตรวจสอบการเชื่อมต่อ
+    // Check connection
     if ($conn->connect_error) {
-        die("การเชื่อมต่อล้มเหลว: " . $conn->connect_error);
+        die("Connection failed: " . $conn->connect_error);
     }
 
-    // สร้างคำสั่ง SQL เพื่อนับจำนวนห้องที่ใช้สัปดาห์นี้
+    // สร้างคำสั่ง SQL เพื่อนับจำนวนห้องที่เริ่มต้นในสัปดาห์นี้
     $sql_weekly_room_count = "SELECT COUNT(task_id) AS room_count FROM task WHERE WEEK(start_date) = WEEK(NOW())";
     $result_weekly_room_count = $conn->query($sql_weekly_room_count);
+    $weekly_room_count = $result_weekly_room_count->fetch_assoc()['room_count'];
 
-
+    // สร้างคำสั่ง SQL เพื่อนับจำนวนห้องทั้งหมดในสัปดาห์นี้ (ทำเหมือนคำสั่งก่อนหน้า)
     $sql_total_room_count = "SELECT COUNT(task_id) AS total_rooms FROM task WHERE WEEK(start_date) = WEEK(NOW())";
     $result_total_room_count = $conn->query($sql_total_room_count);
+    $total_room_count = $result_total_room_count->fetch_assoc()['total_rooms'];
 
-    // สร้างคำสั่ง SQL เพื่อนับจำนวนห้องที่ทำความสะอาดแล้ว (โดยใช้เงื่อนไขเฉพาะที่ room_status เป็น Ready)
-    $sql_cleaned_room_count = "SELECT COUNT(task_id) AS cleaned_rooms FROM task WHERE room_status = 'Ready' AND WEEK(start_date) = WEEK(NOW())";
+    // สร้างคำสั่ง SQL เพื่อนับจำนวนห้องที่ทำความสะอาดแล้ว (ใช้คอลัมน์ที่มีอยู่: status_id หรือ toilet_status_id แทน room_status)
+    $sql_cleaned_room_count = "SELECT COUNT(task_id) AS cleaned_rooms FROM task WHERE status_id = 'Ready' AND WEEK(start_date) = WEEK(NOW())";
     $result_cleaned_room_count = $conn->query($sql_cleaned_room_count);
+    $cleaned_room_count = $result_cleaned_room_count->fetch_assoc()['cleaned_rooms'];
 
-
-    $sql_complete_room_count = "SELECT COUNT(task_id) AS complete_rooms FROM task WHERE room_status = 'Ready' AND WEEK(start_date) = WEEK(NOW())";
+    // สร้างคำสั่ง SQL เพื่อนับจำนวนห้องที่เสร็จสมบูรณ์ (ใช้คอลัมน์ที่มีอยู่: status_id หรือ toilet_status_id แทน room_status)
+    $sql_complete_room_count = "SELECT COUNT(task_id) AS complete_rooms FROM task WHERE status_id = 'Ready' AND WEEK(start_date) = WEEK(NOW())";
     $result_complete_room_count = $conn->query($sql_complete_room_count);
+    $complete_room_count = $result_complete_room_count->fetch_assoc()['complete_rooms'];
 
-    $sql_top_floor_count = "SELECT floor_number, COUNT(*) AS floor_count
+    // สร้างคำสั่ง SQL เพื่อหาหมายเลขชั้นที่มีจำนวนห้องมากที่สุด 3 อันดับแรก
+    $sql_top_floor_count = "SELECT floor_id, COUNT(*) AS floor_count
                     FROM task
-                    GROUP BY floor_number
+                    GROUP BY floor_id
                     ORDER BY floor_count DESC
                     LIMIT 3";
     $result_top_floor_count = $conn->query($sql_top_floor_count);
 
-
-    $floor_numbers = array();
+    $floor_ids = array();
     if ($result_top_floor_count && $result_top_floor_count->num_rows > 0) {
         while ($row = $result_top_floor_count->fetch_assoc()) {
-            $floor_numbers[] = $row['floor_number'];
+            $floor_ids[] = $row['floor_id'];
         }
+
     }
 
     ?>
 
     <div class="row">
-        <!-- Earnings (Weekly) Card Example -->
+        <!-- Number of Rooms Used This Week Card -->
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-primary shadow h-100 py-2">
                 <div class="card-body">
@@ -98,16 +103,12 @@ include 'includes/calendar.php';
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1"
                                 style="font-family: Prompt; font-size: 14.5px;">
-                                จำนวนห้องที่ใช้สัปดาห์นี้</div>
+                                จำนวนห้องที่ใช้สัปดาห์นี้
+                            </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                 <?php
-                                if ($result_weekly_room_count && $result_weekly_room_count->num_rows > 0) {
-                                    while ($row = $result_weekly_room_count->fetch_assoc()) {
-                                        echo '<span style="font-family: Prompt;">' . $row["room_count"] . ' ห้อง</span>';
-                                    }
-                                } else {
-                                    echo "0";
-                                }
+                                // แสดงจำนวนห้องที่ใช้สัปดาห์นี้
+                                echo '<span style="font-family: Prompt;">' . ($weekly_room_count ? $weekly_room_count : '0') . ' ห้อง</span>';
                                 ?>
                             </div>
                         </div>
@@ -119,7 +120,7 @@ include 'includes/calendar.php';
             </div>
         </div>
 
-        <!-- Cleaned Rooms Card Example -->
+        <!-- Cleaned Rooms Card -->
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-success shadow h-100 py-2">
                 <div class="card-body">
@@ -127,16 +128,12 @@ include 'includes/calendar.php';
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1"
                                 style="font-family: Prompt; font-size: 14.5px;">
-                                ทำความสะอาดแล้ว</div>
+                                ทำความสะอาดแล้ว
+                            </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                 <?php
-                                if ($result_cleaned_room_count && $result_cleaned_room_count->num_rows > 0) {
-                                    while ($row = $result_cleaned_room_count->fetch_assoc()) {
-                                        echo '<span style="font-family: Prompt;">' . $row["cleaned_rooms"] . ' ห้อง</span>';
-                                    }
-                                } else {
-                                    echo "0";
-                                }
+                                // แสดงจำนวนห้องที่ทำความสะอาดแล้ว
+                                echo '<span style="font-family: Prompt;">' . ($cleaned_room_count ? $cleaned_room_count : '0') . ' ห้อง</span>';
                                 ?>
                             </div>
                         </div>
@@ -147,47 +144,51 @@ include 'includes/calendar.php';
                 </div>
             </div>
         </div>
-        <!-- Earnings (Monthly) Card Example -->
+
+        <!-- Completion Percentage Card -->
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-info shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1"
-                                style="font-family: Prompt; font-size: 14.5px;">คิดเป็น
+                                style="font-family: Prompt; font-size: 14.5px;">
+                                คิดเป็น
                             </div>
                             <div class="row no-gutters align-items-center">
                                 <div class="col-auto">
                                     <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">
                                         <?php
-                                        if ($result_complete_room_count && $result_complete_room_count->num_rows > 0) {
-                                            while ($row = $result_complete_room_count->fetch_assoc()) {
-                                                $complete_rooms = $row["complete_rooms"];
-                                                if ($result_total_room_count && $result_total_room_count->num_rows > 0) {
-                                                    while ($row_total = $result_total_room_count->fetch_assoc()) {
-                                                        $total_rooms = $row_total["total_rooms"];
-                                                        if ($total_rooms > 0) {
-                                                            $percentage = ($complete_rooms / $total_rooms) * 100;
-                                                            $formatted_percentage = number_format($percentage, 1);
-                                                        } else {
-                                                            $formatted_percentage = 0.0;
-                                                        }
-                                                        echo '<span style="font-family: Prompt;">' . $formatted_percentage . ' % </span>';
+                                        // เริ่มต้นค่าเปอร์เซ็นต์เป็น 0.0
+                                        $percentage = 0.0;
 
-                                                    }
+                                        // ตรวจสอบว่าผลลัพธ์ของการคำนวณมีข้อมูลหรือไม่
+                                        if ($result_complete_room_count && $result_complete_room_count->num_rows > 0) {
+                                            $row = $result_complete_room_count->fetch_assoc();
+                                            $complete_rooms = isset($row["complete_rooms"]) ? $row["complete_rooms"] : 0;
+
+                                            if ($result_total_room_count && $result_total_room_count->num_rows > 0) {
+                                                $row_total = $result_total_room_count->fetch_assoc();
+                                                $total_rooms = isset($row_total["total_rooms"]) ? $row_total["total_rooms"] : 0;
+
+                                                // คำนวณเปอร์เซ็นต์
+                                                if ($total_rooms > 0) {
+                                                    $percentage = ($complete_rooms / $total_rooms) * 100;
                                                 }
                                             }
-                                        } else {
-                                            echo "0";
                                         }
+
+                                        // รูปแบบเปอร์เซ็นต์
+                                        $formatted_percentage = number_format($percentage, 1);
                                         ?>
+                                        <span style="font-family: Prompt;"><?php echo $formatted_percentage; ?> %</span>
                                     </div>
                                 </div>
                                 <div class="col">
                                     <div class="progress progress-sm mr-2">
                                         <div class="progress-bar bg-info" role="progressbar"
-                                            style="width: <?php echo $percentage; ?>%"
-                                            aria-valuenow="<?php echo $percentage; ?>" aria-valuemin="0"
+                                            style="width: <?php echo $formatted_percentage; ?>%"
+                                            aria-valuenow="<?php echo $formatted_percentage; ?>" aria-valuemin="0"
                                             aria-valuemax="100"></div>
                                     </div>
                                 </div>
@@ -201,7 +202,7 @@ include 'includes/calendar.php';
             </div>
         </div>
 
-        <!-- Pending Requests Card Example -->
+        <!-- Special Care Floors Card -->
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-warning shadow h-100 py-2">
                 <div class="card-body">
@@ -212,7 +213,10 @@ include 'includes/calendar.php';
                                 ชั้นที่ต้องดูแลเป็นพิเศษ
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                <?php echo implode(', ', $floor_numbers); ?>
+                                <?php
+                                // แสดงหมายเลขชั้นที่ต้องดูแลเป็นพิเศษ
+                                echo implode(', ', $floor_ids);
+                                ?>
                             </div>
                         </div>
                         <div class="col-auto">
@@ -224,11 +228,9 @@ include 'includes/calendar.php';
         </div>
     </div>
 
-
     <!-- Content Row -->
     <div class="row">
-
-        <!-- Area Chart -->
+        <!-- Calendar -->
         <div class="col-xl-8 col-lg-7">
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
@@ -238,18 +240,11 @@ include 'includes/calendar.php';
                 <!-- Card Body -->
                 <div class="card-body">
                     <div id='calendar'></div>
-                    <style>
-                        #calendar {
-                            max-width: 1000px;
-                            width: 100%;
-                            margin: 0 auto;
-                        }
-                    </style>
                 </div>
             </div>
         </div>
 
-        <!-- Pie Chart -->
+        <!-- Today Notify -->
         <div class="col-xl-4 col-lg-5">
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
@@ -259,97 +254,162 @@ include 'includes/calendar.php';
                 <!-- Card Body -->
                 <div class="card-body">
                     <div class="accordion" id="taskAccordion">
-                        <style>
-                            .card-body p {
-                                font-family: 'Prompt', sans-serif;
-                                font-size: 16px;
-                                /* ปรับขนาด font ตามต้องการ */
-                                color: #333;
-                                /* สีข้อความ */
-                                padding: 10px;
-                                /* ระยะห่างของข้อความ */
-                            }
-                        </style>
-
                         <?php
-                        // สร้างคำสั่ง SQL เพื่อดึงข้อมูล
+                        // กำหนดเขตเวลา
                         date_default_timezone_set('Asia/Bangkok');
                         $today = date('Y-m-d');
-                        // $tomorrow = date('Y-m-d', strtotime('+1 day'));
-                        $sql = "SELECT * FROM task WHERE user_id = {$_SESSION['user_id']} AND start_date = '$today'";
+
+                        // สร้างคำสั่ง SQL เพื่อดึงข้อมูลของทุก user_id และรวมตาราง room_type
+                        if ($role_id == '3') {
+                            $user_id = $_SESSION['user_id']; // รับ user_id จาก session
+                        
+                            // สร้างคำสั่ง SQL เพื่อดึงข้อมูลของทุก user_id และรวมตาราง room_type โดยแสดงเฉพาะ user_id ของผู้ใช้ที่มี role_id = 3
+                            $sql = "SELECT 
+                                t.task_id,
+                                t.start_date,
+                                t.end_date,
+                                u.fullname AS user_fullname,
+                                t.floor_id,
+                                t.room_id,
+                                t.status_id,
+                                t.toilet_gender_id,
+                                t.toilet_status_id,
+                                t.image,
+                                r.room_name,
+                                r.room_type_id,
+                                rt.room_type_name
+                            FROM task t
+                            INNER JOIN users u ON t.user_id = u.user_id
+                            LEFT JOIN room r ON t.room_id = r.room_id
+                            LEFT JOIN room_type rt ON r.room_type_id = rt.room_type_id
+                            WHERE t.start_date = '$today' AND t.user_id = '$user_id'
+                            ORDER BY t.start_date ASC";
+                        } else {
+                            // คำสั่ง SQL สำหรับผู้ใช้ที่มี role_id ไม่ใช่ 3
+                            $sql = "SELECT 
+                                t.task_id,
+                                t.start_date,
+                                t.end_date,
+                                u.fullname AS user_fullname,
+                                t.floor_id,
+                                t.room_id,
+                                t.status_id,
+                                t.toilet_gender_id,
+                                t.toilet_status_id,
+                                t.image,
+                                r.room_name,
+                                r.room_type_id,
+                                rt.room_type_name
+                            FROM task t
+                            INNER JOIN users u ON t.user_id = u.user_id
+                            LEFT JOIN room r ON t.room_id = r.room_id
+                            LEFT JOIN room_type rt ON r.room_type_id = rt.room_type_id
+                            WHERE t.start_date = '$today'
+                            ORDER BY t.start_date ASC";
+                        }
+
+                        // รันคำสั่ง SQL
                         $result = $conn->query($sql);
+
+                        // ตรวจสอบว่ามีข้อมูลหรือไม่
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
                                 echo '<div class="card">';
                                 echo '<div class="card-header" id="heading' . $row["task_id"] . '">';
                                 echo '<h2 class="mb-0">';
                                 echo '<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse' . $row["task_id"] . '" aria-expanded="true" aria-controls="collapse' . $row["task_id"] . '">';
+
+                                // กำหนดไอคอนสถานะ
                                 $status_icon = '';
-                                if ($row["room_status"] == 'Ready' && $row["toilet_status"] == 'Ready') {
-                                    $status_icon = '<i class="fas fa-check-circle text-success"></i>'; // Green check square icon
+                                if ($row["status_id"] == 1 && $row["toilet_status_id"] == 1) {
+                                    $status_icon = '<i class="fas fa-check-circle text-success"></i>'; // ไอคอนสีเขียว
                                 } else {
-                                    $status_icon = '<i class="fas fa-exclamation-circle text-danger"></i>'; // Red square icon
+                                    $status_icon = '<i class="fas fa-exclamation-circle text-danger"></i>'; // ไอคอนสีแดง
                                 }
-                                echo "IF-" . $row["floor_number"] . '0' . $row["room_number"] . ' - ' . $row["task_title"] . ' ' . $status_icon;
+
+                                echo "Floor " . $row["floor_id"] . ' - ' . $row["user_fullname"] . ' ' . $status_icon;
                                 echo '</button>';
                                 echo '</h2>';
                                 echo '</div>';
                                 echo '<div id="collapse' . $row["task_id"] . '" class="collapse" aria-labelledby="heading' . $row["task_id"] . '" data-parent="#taskAccordion">';
                                 echo '<div class="card-body">';
                                 echo '<p>';
-                                echo 'Detail:<br>';
-                                echo 'Start: ' . $row["start_date"] . '<br>';
-                                echo 'Floor: ' . $row["floor_number"] . '<br>';
-                                echo 'Room: ' . $row["room_number"] . '<br>';
-                                echo 'Room Status: ';
-                                switch ($row["room_status"]) {
-                                    case 'Ready':
+                                echo 'รายละเอียด:<br>';
+                                echo 'เริ่ม: ' . $row["start_date"] . '<br>';
+                                echo 'สิ้นสุด: ' . $row["end_date"] . '<br>';
+                                echo 'ชั้น: ' . $row["floor_id"] . '<br>';
+                                echo 'ห้อง: ' . ($row["room_name"] ?? '-') . '<br>';
+                                echo 'สถานะ: ';
+
+                                // แสดงสถานะของงาน
+                                switch ($row["status_id"]) {
+                                    case 1:
                                         echo 'Ready';
                                         break;
-                                    case 'Not Ready':
+                                    case 2:
                                         echo 'Not Ready';
                                         break;
-                                    case 'Waiting':
+                                    case 3:
                                         echo 'Waiting';
                                         break;
                                     default:
-                                        echo $row["room_status"];
+                                        echo '-';
                                         break;
                                 }
                                 echo '<br>';
-                                echo 'Type: ' . $row["room_type"] . '<br>';
-                                echo 'Toilet: ';
-                                if ($row["toilet_gender"] == 'male') {
-                                    echo 'Male';
-                                } elseif ($row["toilet_gender"] == 'female') {
-                                    echo 'Female';
-                                } elseif ($row["toilet_gender"] == 'both') {
-                                    echo 'Both';
+
+                                // แสดงประเภทห้อง
+                                echo 'ประเภท: ' . ($row["room_type_name"] ?? '-') . '<br>';
+
+                                // แสดงห้องน้ำ
+                                echo 'ห้องน้ำ: ';
+                                switch ($row["toilet_gender_id"]) {
+                                    case 1:
+                                        echo 'Male';
+                                        break;
+                                    case 2:
+                                        echo 'Female';
+                                        break;
+                                    case 3:
+                                        echo 'Both';
+                                        break;
+                                    default:
+                                        echo '-';
+                                        break;
                                 }
                                 echo '<br>';
-                                echo 'Toilet Status: ';
-                                switch ($row["toilet_status"]) {
-                                    case 'Ready':
+
+                                // แสดงสถานะห้องน้ำ
+                                echo 'สถานะห้องน้ำ: ';
+                                switch ($row["toilet_status_id"]) {
+                                    case 1:
                                         echo 'Ready';
                                         break;
-                                    case 'Not Ready':
+                                    case 2:
                                         echo 'Not Ready';
                                         break;
-                                    case 'Waiting':
+                                    case 3:
                                         echo 'Waiting';
                                         break;
                                     default:
-                                        echo $row["toilet_status"];
+                                        echo '-';
                                         break;
                                 }
                                 echo '<br>';
+
+                                // แสดงภาพหากมี
+                                if (!empty($row["image"])) {
+                                    echo '<img src="' . $row["image"] . '" alt="Image" style="width: 100px; height: auto;">';
+                                } else {
+                                    echo 'ไม่มีภาพ';
+                                }
                                 echo '</p>';
                                 echo '</div>';
                                 echo '</div>';
                                 echo '</div>';
                             }
                         } else {
-                            echo "No tasks found for tomorrow.";
+                            echo "No tasks found for today.";
                         }
                         ?>
                     </div>
@@ -357,13 +417,14 @@ include 'includes/calendar.php';
             </div>
         </div>
     </div>
+
+    <!-- ปิดการเชื่อมต่อกับ MySQL -->
     <?php
-    // ปิดการเชื่อมต่อกับ MySQL
     $conn->close();
     ?>
-</div>
 
-<?php
-include ('includes/scripts.php');
-include ('includes/footer.php');
-?>
+
+    <?php
+    include ('includes/scripts.php');
+    include ('includes/footer.php');
+    ?>

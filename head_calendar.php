@@ -3,7 +3,7 @@ session_start();
 include 'includes/header.php';
 
 // ตรวจสอบบทบาทของผู้ใช้
-if (!isset($_SESSION['role'])) {
+if (!isset($_SESSION['role_id'])) {
     echo "
     <script type='text/javascript'>
         alert('ไม่สามารถระบุบทบาทของผู้ใช้ได้');
@@ -15,77 +15,88 @@ if (!isset($_SESSION['role'])) {
     exit;
 }
 
-// กำหนดค่าตัวแปร $role จาก Session
-$role = $_SESSION['role'];
+// กำหนดค่าตัวแปร $role_id จาก Session
+$role_id = $_SESSION['role_id'];
 
 // เลือก Navbar ตามบทบาทของผู้ใช้
-if ($role == 'admin') {
+if ($role_id == '1') {
     include 'includes/navbar.php';
-} elseif ($role == 'headmaid') {
+} elseif ($role_id == '2') {
     include 'includes/headmaid_navbar.php';
-} elseif ($role == 'maid') {
+} elseif ($role_id == '3') {
     include 'includes/maid_navbar.php';
 } else {
     echo "ไม่สามารถระบุบทบาทของผู้ใช้ได้";
     exit;
 }
 include 'includes/calendar.php';
+
+// กำหนดตัวแปร $user_id
+$user_id = $_SESSION['user_id'];
+
+// ฟังก์ชันสำหรับการรันคำสั่ง SQL
+function executeQuery($conn, $sql)
+{
+    return $conn->query($sql);
+}
+
+// การกำหนดค่าในการเชื่อมต่อฐานข้อมูล
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "project";
+
+// การเชื่อมต่อกับ MySQL
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// ตรวจสอบการเชื่อมต่อ
+if ($conn->connect_error) {
+    die("การเชื่อมต่อล้มเหลว: " . $conn->connect_error);
+}
+
+// นับจำนวนงาน (ห้อง) ในสัปดาห์นี้
+$sql_weekly_room_count = "SELECT COUNT(task_id) AS room_count 
+                          FROM task 
+                          WHERE WEEK(start_date) = WEEK(NOW())";
+$result_weekly_room_count = executeQuery($conn, $sql_weekly_room_count);
+$weekly_room_count = $result_weekly_room_count->fetch_assoc()['room_count'];
+
+// นับจำนวนห้องทั้งหมดในสัปดาห์นี้
+$result_total_room_count = executeQuery($conn, $sql_weekly_room_count);
+$total_room_count = $result_total_room_count->fetch_assoc()['room_count'];
+
+// นับจำนวนห้องที่ทำความสะอาดแล้ว (สถานะ Ready) ในสัปดาห์นี้
+$sql_cleaned_room_count = "SELECT COUNT(task_id) AS cleaned_rooms 
+                           FROM task 
+                           WHERE status_id = 1  -- สมมุติว่า 1 คือ 'Ready'
+                           AND toilet_status_id = 1  -- สมมุติว่า 1 คือ 'Ready'
+                           AND WEEK(start_date) = WEEK(NOW())";
+$result_cleaned_room_count = executeQuery($conn, $sql_cleaned_room_count);
+$cleaned_room_count = $result_cleaned_room_count->fetch_assoc()['cleaned_rooms'];
+
+// นับจำนวนห้องที่เสร็จสมบูรณ์ (สถานะ Ready) ในสัปดาห์นี้
+$complete_room_count = $cleaned_room_count;
+
+// นับจำนวนงานที่จัดกลุ่มตามหมายเลขชั้นในสัปดาห์นี้
+$sql_floor_user = "SELECT t.floor_id AS floor_number, COUNT(*) AS floor_count
+                   FROM task t
+                   WHERE WEEK(t.start_date) = WEEK(NOW()) 
+                   GROUP BY t.floor_id
+                   ORDER BY floor_count DESC";
+$result_floor_user = executeQuery($conn, $sql_floor_user);
+
+// ดึงหมายเลขชั้นมาใส่ใน array
+$floor_numbers = array();
+if ($result_floor_user && $result_floor_user->num_rows > 0) {
+    while ($row = $result_floor_user->fetch_assoc()) {
+        $floor_numbers[] = $row['floor_number'];
+    }
+}
 ?>
+
 
 <!-- Begin Page Content -->
 <div class="container-fluid">
-
-    <!-- Content Row -->
-    <?php
-    // การกำหนดค่าในการเชื่อมต่อฐานข้อมูล
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
-    $dbname = "project";
-
-    // การเชื่อมต่อกับ MySQL
-    $conn = new mysqli($servername, $username, $password, $dbname);
-
-    // ตรวจสอบการเชื่อมต่อ
-    if ($conn->connect_error) {
-        die("การเชื่อมต่อล้มเหลว: " . $conn->connect_error);
-    }
-
-    // สร้างคำสั่ง SQL เพื่อนับจำนวนห้องที่ใช้สัปดาห์นี้
-    $sql_weekly_room_count = "SELECT COUNT(task_id) AS room_count FROM task WHERE WEEK(start_date) = WEEK(NOW()) AND user_id = {$_SESSION['user_id']} ";
-    $result_weekly_room_count = $conn->query($sql_weekly_room_count);
-
-
-    $sql_total_room_count = "SELECT COUNT(task_id) AS total_rooms FROM task WHERE WEEK(start_date) = WEEK(NOW()) AND user_id = {$_SESSION['user_id']} ";
-    $result_total_room_count = $conn->query($sql_total_room_count);
-
-    // สร้างคำสั่ง SQL เพื่อนับจำนวนห้องที่ทำความสะอาดแล้ว (โดยใช้เงื่อนไขเฉพาะที่ room_status เป็น Ready)
-    $sql_cleaned_room_count = "SELECT COUNT(task_id) AS cleaned_rooms FROM task WHERE room_status = 'Ready' AND toilet_status = 'Ready' AND WEEK(start_date) = WEEK(NOW()) AND user_id = {$_SESSION['user_id']} ";
-    $result_cleaned_room_count = $conn->query($sql_cleaned_room_count);
-
-
-    $sql_complete_room_count = "SELECT COUNT(task_id) AS complete_rooms FROM task WHERE room_status = 'Ready' AND toilet_status = 'Ready' AND WEEK(start_date) = WEEK(NOW()) AND user_id = {$_SESSION['user_id']} ";
-    $result_complete_room_count = $conn->query($sql_complete_room_count);
-
-    $sql_floor_user = "SELECT t.floor_number, COUNT(*) AS floor_count
-    FROM task t
-    INNER JOIN users u ON t.user_id = u.user_id
-    WHERE WEEK(t.start_date) = WEEK(NOW()) AND u.user_id = {$_SESSION['user_id']} 
-    GROUP BY t.floor_number
-    ORDER BY floor_count DESC";
-    $result_floor_user = $conn->query($sql_floor_user);
-
-
-    $floor_numbers = array();
-    if ($result_floor_user && $result_floor_user->num_rows > 0) {
-        while ($row = $result_floor_user->fetch_assoc()) {
-            $floor_numbers[] = $row['floor_number'];
-        }
-    }
-
-    ?>
-
-
 
     <!-- Content Row -->
     <div class="row">
@@ -104,22 +115,19 @@ include 'includes/calendar.php';
                     $today = date("Y-m-d");  // วันที่ปัจจุบัน
                     $sql = "SELECT 
                 t.task_id,
-                t.task_title,
                 t.start_date,
                 t.end_date,
-                t.task_description,
                 u.fullname AS user_fullname,
-                t.floor_number,   
-                t.room_number,    
-                t.room_status,
-                t.room_type,    
-                t.toilet_gender,
-                t.toilet_status,
+                t.floor_id,   
+                t.room_id,    
+                t.status_id,
+                t.toilet_gender_id,
+                t.toilet_status_id,
                 t.image,
                 t.user_id
             FROM task t
             INNER JOIN users u ON t.user_id = u.user_id
-            WHERE t.user_id = {$_SESSION['user_id']} AND WEEK(start_date) = WEEK(NOW())  -- เพิ่มเงื่อนไขเพื่อกรองวันที่เริ่มต้นหลังจากวันที่ปัจจุบัน
+            WHERE WEEK(t.start_date) = WEEK(NOW()) 
             ORDER BY t.start_date ASC";
 
                     $result = $conn->query($sql);
@@ -132,9 +140,8 @@ include 'includes/calendar.php';
                         echo '<tr>';
                         echo '<th>Start Date</th>';
                         echo '<th>End Date</th>';
-                        echo '<th>Task</th>';
+                        echo '<th>User</th>';
                         echo '<th>Floor</th>';
-                        echo '<th>Type</th>';
                         echo '</tr>';
                         echo '</thead>';
                         echo '<tbody>';
@@ -142,10 +149,8 @@ include 'includes/calendar.php';
                             echo '<tr>';
                             echo '<td>' . ($row["start_date"] ?? '-') . '</td>';
                             echo '<td>' . ($row["end_date"] ?? '-') . '</td>';
-                            echo '<td>' . ($row["task_title"] ?? '-') . '</td>';
-                            echo '<td>IF-' . ($row["floor_number"] ?? '-') . '0' . ($row["room_number"] ?? '-') . '</td>';
-                            echo '<td>' . ($row["room_type"] ?? '-') . '</td>';
-
+                            echo '<td>' . ($row["user_fullname"] ?? '-') . '</td>';
+                            echo '<td>' . ($row["floor_id"] ?? '-') . '</td>';
                         }
                         echo '</tbody>';
                         echo '</table>';
@@ -199,34 +204,58 @@ include 'includes/calendar.php';
                             .card-body p {
                                 font-family: 'Prompt', sans-serif;
                                 font-size: 16px;
-                                /* ปรับขนาด font ตามต้องการ */
                                 color: #333;
-                                /* สีข้อความ */
                                 padding: 10px;
-                                /* ระยะห่างของข้อความ */
                             }
                         </style>
 
                         <?php
-                        // สร้างคำสั่ง SQL เพื่อดึงข้อมูล
+                        // กำหนดเขตเวลา
                         date_default_timezone_set('Asia/Bangkok');
                         $today = date('Y-m-d');
-                        // $tomorrow = date('Y-m-d', strtotime('+1 day'));
-                        $sql = "SELECT * FROM task WHERE user_id = {$_SESSION['user_id']} AND start_date = '$today'";
+
+                        // สร้างคำสั่ง SQL เพื่อดึงข้อมูลของทุก user_id และรวมตาราง room_type
+                        $sql = "SELECT 
+            t.task_id,
+            t.start_date,
+            t.end_date,
+            u.fullname AS user_fullname,
+            t.floor_id,
+            t.room_id,
+            t.status_id,
+            t.toilet_gender_id,
+            t.toilet_status_id,
+            t.image,
+            r.room_name,
+            r.room_type_id,
+            rt.room_type_name
+        FROM task t
+        INNER JOIN users u ON t.user_id = u.user_id
+        LEFT JOIN room r ON t.room_id = r.room_id
+        LEFT JOIN room_type rt ON r.room_type_id = rt.room_type_id
+        WHERE t.start_date = '$today'
+        ORDER BY t.start_date ASC";
+
+                        // รันคำสั่ง SQL
                         $result = $conn->query($sql);
+
+                        // ตรวจสอบว่ามีข้อมูลหรือไม่
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
                                 echo '<div class="card">';
                                 echo '<div class="card-header" id="heading' . $row["task_id"] . '">';
                                 echo '<h2 class="mb-0">';
                                 echo '<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse' . $row["task_id"] . '" aria-expanded="true" aria-controls="collapse' . $row["task_id"] . '">';
+
+                                // กำหนดไอคอนสถานะ
                                 $status_icon = '';
-                                if ($row["room_status"] == 'Ready' && $row["toilet_status"] == 'Ready') {
-                                    $status_icon = '<i class="fas fa-check-circle text-success"></i>'; // Green check square icon
+                                if ($row["status_id"] == 1 && $row["toilet_status_id"] == 1) {
+                                    $status_icon = '<i class="fas fa-check-circle text-success"></i>'; // ไอคอนสีเขียว
                                 } else {
-                                    $status_icon = '<i class="fas fa-exclamation-circle text-danger"></i>'; // Red square icon
+                                    $status_icon = '<i class="fas fa-exclamation-circle text-danger"></i>'; // ไอคอนสีแดง
                                 }
-                                echo "IF-" . $row["floor_number"] . '0' . $row["room_number"] . ' - ' . $row["task_title"] . ' ' . $status_icon;
+
+                                echo "Floor " . $row["floor_id"] . ' - ' . $row["user_fullname"] . ' ' . $status_icon;
                                 echo '</button>';
                                 echo '</h2>';
                                 echo '</div>';
@@ -236,64 +265,90 @@ include 'includes/calendar.php';
                                 echo 'รายละเอียด:<br>';
                                 echo 'เริ่ม: ' . $row["start_date"] . '<br>';
                                 echo 'สิ้นสุด: ' . $row["end_date"] . '<br>';
-                                echo 'ชั้น: ' . $row["floor_number"] . '<br>';
-                                echo 'ห้อง: ' . $row["room_number"] . '<br>';
+                                echo 'ชั้น: ' . $row["floor_id"] . '<br>';
+                                echo 'ห้อง: ' . ($row["room_name"] ?? '-' ) . '<br>';
                                 echo 'สถานะ: ';
-                                switch ($row["room_status"]) {
-                                    case 'Ready':
-                                        echo 'พร้อม';
+
+                                // แสดงสถานะของงาน
+                                switch ($row["status_id"]) {
+                                    case 1:
+                                        echo 'Ready';
                                         break;
-                                    case 'Not Ready':
-                                        echo 'ไม่พร้อม';
+                                    case 2:
+                                        echo 'Not Ready';
                                         break;
-                                    case 'Waiting':
-                                        echo 'รอทำความสะอาด';
+                                    case 3:
+                                        echo 'Waiting';
                                         break;
                                     default:
-                                        echo $row["room_status"];
+                                        echo '-';
                                         break;
                                 }
                                 echo '<br>';
-                                echo 'ประเภท: ' . $row["room_type"] . '<br>';
+
+                                // แสดงประเภทห้อง
+                                echo 'ประเภท: ' . ($row["room_type_name"] ?? '-') . '<br>';
+
+                                // แสดงห้องน้ำ
                                 echo 'ห้องน้ำ: ';
-                                if ($row["toilet_gender"] == 'male') {
-                                    echo 'ชาย';
-                                } elseif ($row["toilet_gender"] == 'female') {
-                                    echo 'หญิง';
-                                } else {
-                                    echo $row["toilet_gender"];
-                                }
-                                echo '<br>';
-                                echo 'สถานะ: ';
-                                switch ($row["toilet_status"]) {
-                                    case 'Ready':
-                                        echo 'ทำความสะอาดแล้ว';
+                                switch ($row["toilet_gender_id"]) {
+                                    case 1:
+                                        echo 'Male';
                                         break;
-                                    case 'Not Ready':
-                                        echo 'ไม่พร้อม';
+                                    case 2:
+                                        echo 'Female';
                                         break;
-                                    case 'Waiting':
-                                        echo 'รอทำความสะอาด';
+                                    case 3:
+                                        echo 'Both';
                                         break;
                                     default:
-                                        echo $row["toilet_status"];
+                                        echo '-';
                                         break;
                                 }
                                 echo '<br>';
+
+                                // แสดงสถานะห้องน้ำ
+                                echo 'สถานะห้องน้ำ: ';
+                                switch ($row["toilet_status_id"]) {
+                                    case 1:
+                                        echo 'Ready';
+                                        break;
+                                    case 2:
+                                        echo 'Not Ready';
+                                        break;
+                                    case 3:
+                                        echo 'Waiting';
+                                        break;
+                                    default:
+                                        echo '-';
+                                        break;
+                                }
+                                echo '<br>';
+
+                                // แสดงภาพหากมี
+                                if (!empty($row["image"])) {
+                                    echo '<img src="' . $row["image"] . '" alt="Image" style="width: 100px; height: auto;">';
+                                } else {
+                                    echo 'ไม่มีภาพ';
+                                }
                                 echo '</p>';
                                 echo '</div>';
                                 echo '</div>';
                                 echo '</div>';
                             }
                         } else {
-                            echo "No tasks found for tomorrow.";
+                            echo "No tasks found for today.";
                         }
                         ?>
+
+
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
+
     <?php
     // ปิดการเชื่อมต่อกับ MySQL
     $conn->close();

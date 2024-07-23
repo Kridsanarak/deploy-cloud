@@ -14,7 +14,7 @@ if ($conn->connect_error) {
 }
 
 // สร้างคำสั่ง SQL เพื่อดึงข้อมูลกิจกรรมจากฐานข้อมูล
-$sql = "SELECT task_id, task_title, task_description, start_date FROM task";
+$sql = "SELECT task_id, start_date, end_date, floor_id FROM task";
 $result = $conn->query($sql);
 
 // ตรวจสอบว่ามีข้อมูลหรือไม่
@@ -24,10 +24,10 @@ if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         // กำหนดรูปแบบของกิจกรรมเพื่อให้รับรู้ได้ถูกต้องโดย FullCalendar
         $event = array();
-        $event['id'] = $row['task_id']; // แก้ไขชื่อคอลัมน์ให้ตรงกับฐานข้อมูล
-        $event['title'] = $row['task_title']; // แก้ไขชื่อคอลัมน์ให้ตรงกับฐานข้อมูล
-        $event['start'] = $row['start_date']; // แก้ไขชื่อคอลัมน์ให้ตรงกับฐานข้อมูล
-        $event['description'] = $row['task_description']; // แก้ไขชื่อคอลัมน์ให้ตรงกับฐานข้อมูล
+        $event['id'] = $row['task_id'];
+        $event['start'] = $row['start_date'];
+        $event['end'] = $row['end_date'];
+        $event['floor_id'] = $row['floor_id'];
 
         // เพิ่มกิจกรรมเข้าใน array ที่เก็บข้อมูลกิจกรรมทั้งหมด
         array_push($tasks, $event);

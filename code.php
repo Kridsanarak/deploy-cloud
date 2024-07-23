@@ -21,26 +21,35 @@ if (isset($_POST['registerbtn'])) {
     $fullname = $_POST['fullname'];
     $username = $_POST['username'];
     $password = sha1($_POST['password']); // Hash the password using SHA-1
-    $role = $_POST['role'];
+    $role_id = $_POST['role_id'];
+    $status_id = $_POST['status_id'];
 
-    // คำสั่ง SQL เพื่อเพิ่มข้อมูลผู้ใช้
-    $query = "INSERT INTO users (fullname, username, password, role) VALUES ('$fullname', '$username', '$password', '$role')";
+    // แปลง timestamp เป็นรูปแบบวันที่และเวลาที่ต้องการ
+    $formatted_date = date("Y-m-d H:i:s", $timestamp);
 
-    // ทำการ query คำสั่ง SQL
-    if (mysqli_query($connection, $query)) {
+    // ดึงค่า timestamp ปัจจุบัน
+    $timestamp = time();
+
+    // ใช้ Prepared Statements
+    $stmt = $connection->prepare("INSERT INTO users (fullname, username, password, role_id, status_id, timestamp) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssss", $fullname, $username, $password, $role_id, $status_id, $timestamp);
+
+    if ($stmt->execute()) {
         $_SESSION['status'] = "User added successfully!";
         $_SESSION['status_code'] = "success";
     } else {
-        $_SESSION['status'] = "Failed to add user";
+        $_SESSION['status'] = "Failed to add user: " . $stmt->error;
         $_SESSION['status_code'] = "error";
     }
 
     // ปิดการเชื่อมต่อ
+    $stmt->close();
     $connection->close();
 
     // นำกลับไปยังหน้า users.php
     header('Location: users.php');
 }
+
 
 // Handle user deletion
 if (isset($_POST['deleteUserId'])) {
@@ -85,6 +94,7 @@ if (isset($_POST['deleteUserId'])) {
     header('Location: users.php');
 }
 
+
 if (isset($_POST['add_task_btn'])) {
     $servername = "localhost";
     $username = "root";
@@ -98,47 +108,45 @@ if (isset($_POST['add_task_btn'])) {
     }
 
     $user_id = $_POST['user_id'];
-    $task_title = $_POST['task_title'];
-    $task_description = $_POST['task_description'];
     $start_date = $_POST['start_date'];
     $end_date = $_POST['end_date'];
-    $floor_number = $_POST['floor_number'];
-    $room_number = $_POST['room_number'];
-    $room_status = $_POST['room_status'];
-    $room_type = $_POST['room_type'];
-    $toilet_gender = $_POST['toilet_gender'];
-    $toilet_status = $_POST['toilet_status'];
+    $floor_id = $_POST['floor_id'];
+    $room_id = !empty($_POST['room_id']) ? $_POST['room_id'] : null;
+    $status_id = !empty($_POST['status_id']) ? $_POST['status_id'] : null;
+    $toilet_gender_id = !empty($_POST['toilet_gender_id']) ? $_POST['toilet_gender_id'] : null;
+    $toilet_status_id = !empty($_POST['toilet_status_id']) ? $_POST['toilet_status_id'] : null;
 
-    // Convert start and end dates to DateTime objects
+    // แปลงวันที่เริ่มต้นและวันที่สิ้นสุดเป็นออบเจ็กต์ DateTime
     $start = new DateTime($start_date);
     $end = new DateTime($end_date);
-    $end = $end->modify('+1 day'); // include end date in the period
+    $end = $end->modify('+1 day'); // รวมวันที่สิ้นสุดในช่วงเวลา
 
-    // Create a DatePeriod with 1 day intervals
+    // สร้าง DatePeriod โดยมีช่วงเวลาหนึ่งวัน
     $interval = new DateInterval('P1D');
     $period = new DatePeriod($start, $interval, $end);
 
     foreach ($period as $date) {
         $current_date = $date->format('Y-m-d');
 
-        // Insert task for each date in the range
-        $query = "INSERT INTO task (user_id, task_title, task_description, start_date, end_date, floor_number, room_number, room_status, room_type, toilet_gender, toilet_status) 
-                  VALUES ('$user_id', '$task_title', '$task_description', '$current_date', '$current_date', '$floor_number', '$room_number', '$room_status', '$room_type', '$toilet_gender', '$toilet_status')";
-        
+        // เพิ่มงานสำหรับแต่ละวันที่ในช่วงเวลา
+        $query = "INSERT INTO task (user_id, start_date, end_date, floor_id, room_id, status_id, toilet_gender_id, toilet_status_id) 
+                  VALUES ('$user_id', '$current_date', '$current_date', '$floor_id', " . ($room_id !== null ? "'$room_id'" : "NULL") . ", " . ($status_id !== null ? "'$status_id'" : "NULL") . ", " . ($toilet_gender_id !== null ? "'$toilet_gender_id'" : "NULL") . ", " . ($toilet_status_id !== null ? "'$toilet_status_id'" : "NULL") . ")";
+
         if (mysqli_query($connection, $query)) {
             $_SESSION['status'] = "Task added successfully!";
             $_SESSION['status_code'] = "success";
         } else {
-            $_SESSION['status'] = "Failed to add task";
+            $_SESSION['status'] = "Failed to add task: " . mysqli_error($connection);
             $_SESSION['status_code'] = "error";
         }
     }
 
-    // Close connection
+    // ปิดการเชื่อมต่อ
     $connection->close();
 
-    // Redirect back to main page
+    // เปลี่ยนเส้นทางกลับไปที่หน้าแรก
     header('Location: main.php');
 }
+
 
 ?>

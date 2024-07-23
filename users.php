@@ -3,7 +3,7 @@ session_start();
 include 'includes/header.php';
 
 // ตรวจสอบบทบาทของผู้ใช้
-if (!isset($_SESSION['role'])) {
+if (!isset($_SESSION['role_id'])) {
     echo "
     <script type='text/javascript'>
         alert('ไม่สามารถระบุบทบาทของผู้ใช้ได้');
@@ -15,15 +15,15 @@ if (!isset($_SESSION['role'])) {
     exit;
 }
 
-// กำหนดค่าตัวแปร $role จาก Session
-$role = $_SESSION['role'];
+// กำหนดค่าตัวแปร $role_id จาก Session
+$role_id = $_SESSION['role_id'];
 
 // เลือก Navbar ตามบทบาทของผู้ใช้
-if ($role == 'admin') {
+if ($role_id == '1') {
     include 'includes/navbar.php';
-} elseif ($role == 'headmaid') {
+} elseif ($role_id == '2') {
     include 'includes/headmaid_navbar.php';
-} elseif ($role == 'maid') {
+} elseif ($role_id == '3') {
     include 'includes/maid_navbar.php';
 } else {
     echo "ไม่สามารถระบุบทบาทของผู้ใช้ได้";
@@ -69,21 +69,20 @@ include 'includes/calendar.php';
                                 </div>
                                 <div class="form-group">
                                     <label> Role </label>
-                                    <select name="role" class="form-control">
-                                    <option value="">--- Please select ---</option>
-                                        <option value="admin">Admin</option>
-                                        <option value="headmaid">หัวหน้าแม่บ้าน</option>
-                                        <option value="maid">แม่บ้าน</option>
+                                    <select name="role_id" class="form-control">
+                                        <option value="">--- Please select ---</option>
+                                        <option value="1">Admin</option>
+                                        <option value="2">หัวหน้าแม่บ้าน</option>
+                                        <option value="3">แม่บ้าน</option>
                                     </select>
                                 </div>
 
                                 <div class="form-group">
                                     <label>Status</label>
-                                    <select name="status" class="form-control">
-                                    <option value="">--- Please select ---</option>
-                                        <option value="พร้อม">พร้อม</option>
-                                        <option value="ลา">ลา</option>
-                                        <option value="ไม่พร้อม">ไม่พร้อม</option>
+                                    <select name="status_id" class="form-control">
+                                        <option value="">--- Please select ---</option>
+                                        <option value="1">พร้อม</option>
+                                        <option value="3">ลา</option>
                                     </select>
                                 </div>
 
@@ -133,26 +132,40 @@ include 'includes/calendar.php';
             echo '<th>Name</th>';
             echo '<th>Username</th>';
             echo '<th>Role</th>';
-            echo '<th>Lasttime Login</th>';
+            echo '<th>Timestamp</th>';
             echo '<th>Status</th>';
             echo '<th>Action</th>';
             echo '</tr>';
             echo '</thead>';
             echo '<tbody>';
             while ($row = $result->fetch_assoc()) {
+                // แปลง role_id เป็นข้อความที่อ่านได้
+                if ($row['role_id'] == 1) {
+                    $role = 'Admin';
+                } elseif ($row['role_id'] == 2) {
+                    $role = 'Headmaid';
+                } else {
+                    $role = 'Maid';
+                }
+
+                // แปลง status_id เป็นข้อความที่อ่านได้
+                if ($row['status_id'] == 1) {
+                    $status = 'พร้อม';
+                } else {
+                    $status = 'ลา';
+                }
+
                 echo '<tr>';
-                echo '<td>' . $row["fullname"] . '</td>';
-                echo '<td>' . $row["username"] . '</td>';
-                echo '<td>' . $row["role"] . '</td>';
-                echo '<td>' . $row["lasttime_login"] . '</td>';
-                echo '<td>' . $row["status"] . '</td>';
-                // เพิ่มปุ่ม edit user
-                // Inside the while loop where you generate the table rows
+                echo '<td>' . htmlspecialchars($row["fullname"], ENT_QUOTES, 'UTF-8') . '</td>';
+                echo '<td>' . htmlspecialchars($row["username"], ENT_QUOTES, 'UTF-8') . '</td>';
+                echo '<td>' . $role . '</td>';
+                echo '<td>' . htmlspecialchars($row["timestamp"], ENT_QUOTES, 'UTF-8') . '</td>';
+                echo '<td>' . $status . '</td>';
                 echo '<td>
                     <button class="btn btn-primary btn-circle btn-sm mr-1" data-toggle="modal" data-target="#editadminprofile' . $row["user_id"] . '"><i class="fas fa-edit"></i></button>
                     <form action="code.php" method="POST" style="display:inline;">
-                    <input type="hidden" name="deleteUserId" value="' . $row["user_id"] . '">
-                    <button type="submit" class="btn btn-danger btn-circle btn-sm" onclick="return confirm(\'Are you sure you want to delete this user?\')"><i class="fas fa-trash"></i></button>
+                        <input type="hidden" name="deleteUserId" value="' . $row["user_id"] . '">
+                        <button type="submit" class="btn btn-danger btn-circle btn-sm" onclick="return confirm(\'Are you sure you want to delete this user?\')"><i class="fas fa-trash"></i></button>
                     </form>
                 </td>';
                 // เพิ่มโมดัลเชียลแก้ไขผู้ใช้ (edit user modal) ด้วย ID ที่ไม่ซ้ำกันตาม user_id
@@ -167,32 +180,32 @@ include 'includes/calendar.php';
                 echo '</div>';
                 echo '<form action="edit_user.php" method="POST">';
                 echo '<div class="modal-body">';
-                echo '<input type="hidden" name="user_id" value="' . $row["user_id"] . '">'; // ส่งค่า user_id ไปยังหน้า edit_user.php
+                echo '<input type="hidden" name="user_id" value="' . $row["user_id"] . '">';
                 echo '<div class="form-group">';
                 echo '<label>Fullname</label>';
-                echo '<input type="text" name="fullname" class="form-control" value="' . $row["fullname"] . '">';
+                echo '<input type="text" name="fullname" class="form-control" value="' . htmlspecialchars($row["fullname"], ENT_QUOTES, 'UTF-8') . '">';
                 echo '</div>';
                 echo '<div class="form-group">';
                 echo '<label>Username</label>';
-                echo '<input type="text" name="username" class="form-control" value="' . $row["username"] . '">';
+                echo '<input type="text" name="username" class="form-control" value="' . htmlspecialchars($row["username"], ENT_QUOTES, 'UTF-8') . '">';
                 echo '</div>';
                 echo '<div class="form-group">';
                 echo '<label>Password</label>';
-                echo '<input type="text" name="password" class="form-control" value="' . $row["password"] . '">';
+                echo '<input type="password" name="password" class="form-control" value="' . htmlspecialchars($row["password"], ENT_QUOTES, 'UTF-8') . '">';
                 echo '</div>';
                 echo '<div class="form-group">';
                 echo '<label>Role</label>';
-                echo '<select name="role" class="form-control">';
-                echo '<option value="admin" ' . ($row["role"] == "admin" ? "selected" : "") . '>Admin</option>';
-                echo '<option value="headmaid" ' . ($row["role"] == "headmaid" ? "selected" : "") . '>หัวหน้าแม่บ้าน</option>';
-                echo '<option value="maid" ' . ($row["role"] == "maid" ? "selected" : "") . '>แม่บ้าน</option>';         
+                echo '<select name="role_id" class="form-control">';
+                echo '<option value="1" ' . ($row["role_id"] == 1 ? "selected" : "") . '>Admin</option>';
+                echo '<option value="2" ' . ($row["role_id"] == 2 ? "selected" : "") . '>Headmaid</option>';
+                echo '<option value="3" ' . ($row["role_id"] == 3 ? "selected" : "") . '>Maid</option>';         
                 echo '</select>';
                 echo '</div>';
                 echo '<div class="form-group">';
                 echo '<label>Status</label>';
-                echo '<select name="status" class="form-control">';
-                echo '<option value="พร้อม" ' . ($row["status"] == "พร้อม" ? "selected" : "") . '>พร้อม</option>';
-                echo '<option value="ลา" ' . ($row["status"] == "ลา" ? "selected" : "") . '>ลา</option>';
+                echo '<select name="status_id" class="form-control">';
+                echo '<option value="1" ' . ($row["status_id"] == 1 ? "selected" : "") . '>พร้อม</option>';
+                echo '<option value="3" ' . ($row["status_id"] == 3 ? "selected" : "") . '>ลา</option>';
                 echo '</select>';
                 echo '</div>';
                 echo '</div>';

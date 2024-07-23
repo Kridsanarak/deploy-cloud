@@ -40,7 +40,7 @@
     </li>
 
     <li class="nav-item">
-        <a class="nav-link" href="table_head.php">
+        <a class="nav-link" href="tables.php">
             <i class="far fa-check-circle"></i>
             <span>Work Check</span></a>
     </li>

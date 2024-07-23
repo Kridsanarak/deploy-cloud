@@ -3,7 +3,7 @@ session_start();
 include 'includes/header.php';
 
 // ตรวจสอบบทบาทของผู้ใช้
-if (!isset($_SESSION['role'])) {
+if (!isset($_SESSION['role_id'])) {
     echo "
     <script type='text/javascript'>
         alert('ไม่สามารถระบุบทบาทของผู้ใช้ได้');
@@ -15,15 +15,15 @@ if (!isset($_SESSION['role'])) {
     exit;
 }
 
-// กำหนดค่าตัวแปร $role จาก Session
-$role = $_SESSION['role'];
+// กำหนดค่าตัวแปร $role_id จาก Session
+$role_id = $_SESSION['role_id'];
 
 // เลือก Navbar ตามบทบาทของผู้ใช้
-if ($role == 'admin') {
+if ($role_id == '1') {
     include 'includes/navbar.php';
-} elseif ($role == 'headmaid') {
+} elseif ($role_id == '2') {
     include 'includes/headmaid_navbar.php';
-} elseif ($role == 'maid') {
+} elseif ($role_id == '3') {
     include 'includes/maid_navbar.php';
 } else {
     echo "ไม่สามารถระบุบทบาทของผู้ใช้ได้";
