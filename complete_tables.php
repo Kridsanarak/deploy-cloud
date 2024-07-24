@@ -39,7 +39,7 @@ include 'includes/calendar.php';
     <!-- DataTales Example -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">DataTables</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Complete Work</h6>
         </div>
         <?php
         date_default_timezone_set('Asia/Bangkok');
@@ -60,25 +60,46 @@ include 'includes/calendar.php';
         // สร้างคำสั่ง SQL เพื่อดึงข้อมูลเฉพาะที่มี end_date ก่อนวันนี้
         $today = date('Y-m-d');
 
-        $sql = "SELECT 
-    t.task_id,
-    t.start_date,
-    t.end_date,
-    t.user_id,
-    t.floor_id,
-    t.room_id,
-    t.status_id,
-    t.toilet_gender_id,
-    t.toilet_status_id,
-    t.image,
-    u.fullname AS user_fullname,
-    r.room_name
-FROM task t
-INNER JOIN users u ON t.user_id = u.user_id
-LEFT JOIN room r ON t.room_id = r.room_id
-WHERE t.end_date < '$today'
-AND t.user_id = $current_user_id
-ORDER BY t.end_date ASC";
+        if ($role_id == 1 || $role_id == 2) {
+            $sql = "SELECT 
+        t.task_id,
+        t.start_date,
+        t.end_date,
+        t.user_id,
+        t.floor_id,
+        t.room_id,
+        t.status_id,
+        t.toilet_gender_id,
+        t.toilet_status_id,
+        t.image,
+        u.fullname AS user_fullname,
+        r.room_name
+    FROM task t
+    INNER JOIN users u ON t.user_id = u.user_id
+    LEFT JOIN room r ON t.room_id = r.room_id
+    WHERE t.end_date < '$today'
+    ORDER BY t.end_date ASC";
+        } else {
+            $sql = "SELECT 
+        t.task_id,
+        t.start_date,
+        t.end_date,
+        t.user_id,
+        t.floor_id,
+        t.room_id,
+        t.status_id,
+        t.toilet_gender_id,
+        t.toilet_status_id,
+        t.image,
+        u.fullname AS user_fullname,
+        r.room_name
+    FROM task t
+    INNER JOIN users u ON t.user_id = u.user_id
+    LEFT JOIN room r ON t.room_id = r.room_id
+    WHERE t.end_date < '$today'
+    AND t.user_id = $current_user_id
+    ORDER BY t.end_date ASC";
+        }
 
         $result = $conn->query($sql);
 
