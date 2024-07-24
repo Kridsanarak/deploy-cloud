@@ -5,7 +5,7 @@ if (isset($_POST['edit_user_btn'])) {
     $servername = "localhost";
     $username = "root";
     $password = "";
-    $dbname = "project";
+    $dbname = "project_maidmanage";
 
     // สร้างการเชื่อมต่อกับฐานข้อมูล
     $connection = new mysqli($servername, $username, $password, $dbname);

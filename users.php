@@ -82,6 +82,7 @@ include 'includes/calendar.php';
                                     <select name="status_id" class="form-control">
                                         <option value="">--- Please select ---</option>
                                         <option value="1">พร้อม</option>
+                                        <option value="2">ไม่พร้อม</option>
                                         <option value="3">ลา</option>
                                     </select>
                                 </div>
@@ -108,7 +109,7 @@ include 'includes/calendar.php';
         $servername = "localhost";
         $username = "root";
         $password = "";
-        $dbname = "project";
+        $dbname = "project_maidmanage";
 
         // การเชื่อมต่อกับ MySQL
         $conn = new mysqli($servername, $username, $password, $dbname);
@@ -151,8 +152,10 @@ include 'includes/calendar.php';
                 // แปลง status_id เป็นข้อความที่อ่านได้
                 if ($row['status_id'] == 1) {
                     $status = 'พร้อม';
-                } else {
+                } elseif ($row['status_id'] == 3) {
                     $status = 'ลา';
+                } else {
+                    $status = 'ไม่พร้อม';
                 }
 
                 echo '<tr>';
@@ -205,6 +208,7 @@ include 'includes/calendar.php';
                 echo '<label>Status</label>';
                 echo '<select name="status_id" class="form-control">';
                 echo '<option value="1" ' . ($row["status_id"] == 1 ? "selected" : "") . '>พร้อม</option>';
+                echo '<option value="2" ' . ($row["status_id"] == 2 ? "selected" : "") . '>ไม่พร้อม</option>';
                 echo '<option value="3" ' . ($row["status_id"] == 3 ? "selected" : "") . '>ลา</option>';
                 echo '</select>';
                 echo '</div>';

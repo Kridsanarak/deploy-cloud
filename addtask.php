@@ -52,7 +52,7 @@ include 'includes/calendar.php';
                         $servername = "localhost";
                         $username = "root";
                         $password = "";
-                        $dbname = "project";
+                        $dbname = "project_maidmanage";
                         $conn = new mysqli($servername, $username, $password, $dbname);
                         // Check connection
                         if ($conn->connect_error) {
@@ -84,7 +84,7 @@ include 'includes/calendar.php';
                     <label>End Date</label>
                     <input type="date" name="end_date" class="form-control" required min="<?php
                     date_default_timezone_set('Asia/Bangkok');
-                    echo date('Y-m-d', strtotime('+1 day')); ?>">
+                    echo date('Y-m-d'); ?>">
                 </div>
 
                 <!-- Floor Number -->

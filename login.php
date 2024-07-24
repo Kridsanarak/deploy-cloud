@@ -4,7 +4,7 @@ session_start();
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "project";
+$dbname = "project_maidmanage";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 

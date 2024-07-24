@@ -17,6 +17,7 @@ if (!isset($_SESSION['role_id'])) {
 
 // กำหนดค่าตัวแปร $role_id จาก Session
 $role_id = $_SESSION['role_id'];
+$user_id = $_SESSION['user_id'];
 
 // เลือก Navbar ตามบทบาทของผู้ใช้
 if ($role_id == '1') {
@@ -42,46 +43,75 @@ include 'includes/calendar.php';
 
     <!-- Content Row -->
     <?php
-
+    date_default_timezone_set('Asia/Bangkok');
+    // การกำหนดค่าในการเชื่อมต่อฐานข้อมูล
     $servername = "localhost";
     $username = "root";
     $password = "";
-    $dbname = "project";
+    $dbname = "project_maidmanage";
 
-    // Establishing connection to MySQL
+    // การเชื่อมต่อกับ MySQL
     $conn = new mysqli($servername, $username, $password, $dbname);
 
-    // Check connection
+    // ตรวจสอบการเชื่อมต่อ
     if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
+        die("การเชื่อมต่อล้มเหลว: " . $conn->connect_error);
     }
 
-    // สร้างคำสั่ง SQL เพื่อนับจำนวนห้องที่เริ่มต้นในสัปดาห์นี้
-    $sql_weekly_room_count = "SELECT COUNT(task_id) AS room_count FROM task WHERE WEEK(start_date) = WEEK(NOW())";
+    // คำนวณวันจันทร์ของสัปดาห์ปัจจุบัน
+    $today = date('Y-m-d');
+    $monday = date('Y-m-d', strtotime('monday this week', strtotime($today)));
+
+    // คำนวณวันอาทิตย์ของสัปดาห์ถัดไป
+    $nextSunday = date('Y-m-d', strtotime('sunday next week', strtotime($monday)));
+
+    // เงื่อนไขการกรองข้อมูลตามบทบาท
+    $user_condition = $role_id == '3' ? "AND user_id = '$user_id'" : "";
+
+    // นับจำนวนห้องที่เริ่มต้นในช่วง 7 วันจากวันจันทร์ถึงวันอาทิตย์
+    $sql_weekly_room_count = "SELECT COUNT(task_id) AS room_count 
+                              FROM task 
+                              WHERE start_date >= '$monday' AND start_date <= '$nextSunday' 
+                              $user_condition";
     $result_weekly_room_count = $conn->query($sql_weekly_room_count);
     $weekly_room_count = $result_weekly_room_count->fetch_assoc()['room_count'];
 
-    // สร้างคำสั่ง SQL เพื่อนับจำนวนห้องทั้งหมดในสัปดาห์นี้ (ทำเหมือนคำสั่งก่อนหน้า)
-    $sql_total_room_count = "SELECT COUNT(task_id) AS total_rooms FROM task WHERE WEEK(start_date) = WEEK(NOW())";
+    // นับจำนวนห้องทั้งหมดในช่วง 7 วันจากวันจันทร์ถึงวันอาทิตย์
+    $sql_total_room_count = "SELECT COUNT(task_id) AS total_rooms 
+                             FROM task 
+                             WHERE start_date >= '$monday' AND start_date <= '$nextSunday' 
+                             $user_condition";
     $result_total_room_count = $conn->query($sql_total_room_count);
     $total_room_count = $result_total_room_count->fetch_assoc()['total_rooms'];
 
-    // สร้างคำสั่ง SQL เพื่อนับจำนวนห้องที่ทำความสะอาดแล้ว (ใช้คอลัมน์ที่มีอยู่: status_id หรือ toilet_status_id แทน room_status)
-    $sql_cleaned_room_count = "SELECT COUNT(task_id) AS cleaned_rooms FROM task WHERE status_id = 'Ready' AND WEEK(start_date) = WEEK(NOW())";
+    // นับจำนวนห้องที่ทำความสะอาดแล้วในช่วง 7 วันจากวันจันทร์ถึงวันอาทิตย์
+    $sql_cleaned_room_count = "SELECT COUNT(task_id) AS cleaned_rooms 
+                               FROM task 
+                           WHERE (status_id = 1 OR status_id IS NULL)  -- 1 คือ 'Ready' หรือ NULL
+                           AND (toilet_status_id = 1 OR toilet_status_id IS NULL)  -- 1 คือ 'Ready' หรือ NULL
+                               AND start_date >= '$monday' AND start_date <= '$nextSunday' 
+                               $user_condition";
     $result_cleaned_room_count = $conn->query($sql_cleaned_room_count);
     $cleaned_room_count = $result_cleaned_room_count->fetch_assoc()['cleaned_rooms'];
 
-    // สร้างคำสั่ง SQL เพื่อนับจำนวนห้องที่เสร็จสมบูรณ์ (ใช้คอลัมน์ที่มีอยู่: status_id หรือ toilet_status_id แทน room_status)
-    $sql_complete_room_count = "SELECT COUNT(task_id) AS complete_rooms FROM task WHERE status_id = 'Ready' AND WEEK(start_date) = WEEK(NOW())";
+    // นับจำนวนห้องที่เสร็จสมบูรณ์ในช่วง 7 วันจากวันจันทร์ถึงวันอาทิตย์
+    $sql_complete_room_count = "SELECT COUNT(task_id) AS complete_rooms 
+                                FROM task 
+                           WHERE (status_id = 1 OR status_id IS NULL)  -- 1 คือ 'Ready' หรือ NULL
+                           AND (toilet_status_id = 1 OR toilet_status_id IS NULL)  -- 1 คือ 'Ready' หรือ NULL
+                                AND start_date >= '$monday' AND start_date <= '$nextSunday' 
+                                $user_condition";
     $result_complete_room_count = $conn->query($sql_complete_room_count);
     $complete_room_count = $result_complete_room_count->fetch_assoc()['complete_rooms'];
 
-    // สร้างคำสั่ง SQL เพื่อหาหมายเลขชั้นที่มีจำนวนห้องมากที่สุด 3 อันดับแรก
+    // หาหมายเลขชั้นที่มีจำนวนห้องมากที่สุด 3 อันดับแรกในช่วง 7 วันจากวันจันทร์ถึงวันอาทิตย์
     $sql_top_floor_count = "SELECT floor_id, COUNT(*) AS floor_count
-                    FROM task
-                    GROUP BY floor_id
-                    ORDER BY floor_count DESC
-                    LIMIT 3";
+                            FROM task
+                            WHERE start_date >= '$monday' AND start_date <= '$nextSunday'
+                            $user_condition
+                            GROUP BY floor_id
+                            ORDER BY floor_count DESC
+                            LIMIT 3";
     $result_top_floor_count = $conn->query($sql_top_floor_count);
 
     $floor_ids = array();
@@ -89,7 +119,6 @@ include 'includes/calendar.php';
         while ($row = $result_top_floor_count->fetch_assoc()) {
             $floor_ids[] = $row['floor_id'];
         }
-
     }
 
     ?>
@@ -163,19 +192,11 @@ include 'includes/calendar.php';
                                         $percentage = 0.0;
 
                                         // ตรวจสอบว่าผลลัพธ์ของการคำนวณมีข้อมูลหรือไม่
-                                        if ($result_complete_room_count && $result_complete_room_count->num_rows > 0) {
-                                            $row = $result_complete_room_count->fetch_assoc();
-                                            $complete_rooms = isset($row["complete_rooms"]) ? $row["complete_rooms"] : 0;
-
-                                            if ($result_total_room_count && $result_total_room_count->num_rows > 0) {
-                                                $row_total = $result_total_room_count->fetch_assoc();
-                                                $total_rooms = isset($row_total["total_rooms"]) ? $row_total["total_rooms"] : 0;
-
-                                                // คำนวณเปอร์เซ็นต์
-                                                if ($total_rooms > 0) {
-                                                    $percentage = ($complete_rooms / $total_rooms) * 100;
-                                                }
-                                            }
+                                        if ($total_room_count > 0) {
+                                            // ตรวจสอบและดึงข้อมูลจำนวนห้องที่เสร็จสมบูรณ์
+                                            $complete_rooms = $complete_room_count;
+                                            // คำนวณเปอร์เซ็นต์
+                                            $percentage = ($complete_rooms / $total_room_count) * 100;
                                         }
 
                                         // รูปแบบเปอร์เซ็นต์
@@ -321,7 +342,7 @@ include 'includes/calendar.php';
 
                                 // กำหนดไอคอนสถานะ
                                 $status_icon = '';
-                                if ($row["status_id"] == 1 && $row["toilet_status_id"] == 1) {
+                                if (($row["status_id"] == 1 || is_null($row["status_id"])) && ($row["toilet_status_id"] == 1 || is_null($row["toilet_status_id"]))) {
                                     $status_icon = '<i class="fas fa-check-circle text-success"></i>'; // ไอคอนสีเขียว
                                 } else {
                                     $status_icon = '<i class="fas fa-exclamation-circle text-danger"></i>'; // ไอคอนสีแดง

@@ -45,7 +45,7 @@ include 'includes/calendar.php';
         $servername = "localhost";
         $username = "root";
         $password = "";
-        $dbname = "project";
+        $dbname = "project_maidmanage";
 
         // การเชื่อมต่อกับ MySQL
         $conn = new mysqli($servername, $username, $password, $dbname);
@@ -69,6 +69,7 @@ include 'includes/calendar.php';
             echo '<th>Name</th>';
             echo '<th>Username</th>';
             echo '<th>Role</th>';
+            echo '<th>Timestamp</th>';
             echo '<th>Status</th>';
             echo '</tr>';
             echo '</thead>';
@@ -86,6 +87,8 @@ include 'includes/calendar.php';
                 // แปลง status_id เป็นข้อความที่อ่านได้
                 if ($row['status_id'] == 1) {
                     $status = 'พร้อม';
+                } elseif ($row['status_id'] == 2) {
+                    $status = 'ไม่พร้อม';
                 } else {
                     $status = 'ลา';
                 }
@@ -93,6 +96,7 @@ include 'includes/calendar.php';
                 echo '<td>' . $row["fullname"] . '</td>';
                 echo '<td>' . $row["username"] . '</td>';
                 echo '<td>' . $role . '</td>';
+                echo '<td>' . $row["timestamp"] . '</td>';
                 echo '<td>' . $status . '</td>';
             }
             echo '</tbody>';

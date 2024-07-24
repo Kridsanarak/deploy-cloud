@@ -52,7 +52,7 @@ include 'includes/calendar.php';
                         $servername = "localhost";
                         $username = "root";
                         $password = "";
-                        $dbname = "project";
+                        $dbname = "project_maidmanage";
                         $conn = new mysqli($servername, $username, $password, $dbname);
                         // Check connection
                         if ($conn->connect_error) {

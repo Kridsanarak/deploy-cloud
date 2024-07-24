@@ -7,7 +7,7 @@ if (isset($_POST['submit_work_btn'])) {
     $servername = "localhost";
     $username = "root";
     $password = "";
-    $dbname = "project";
+    $dbname = "project_maidmanage";
 
     $connection = new mysqli($servername, $username, $password, $dbname);
 

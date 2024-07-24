@@ -49,7 +49,7 @@ include 'includes/calendar.php';
     $servername = "localhost";
     $username = "root";
     $password = "";
-    $dbname = "project";
+    $dbname = "project_maidmanage";
 
     // การเชื่อมต่อกับ MySQL
     $conn = new mysqli($servername, $username, $password, $dbname);

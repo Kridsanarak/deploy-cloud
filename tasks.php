@@ -3,7 +3,7 @@
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "project";
+$dbname = "project_maidmanage";
 
 // Establishing connection to MySQL
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -13,32 +13,45 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// สร้างคำสั่ง SQL เพื่อดึงข้อมูลกิจกรรมจากฐานข้อมูล
-$sql = "SELECT task_id, start_date, end_date, floor_id FROM task";
-$result = $conn->query($sql);
+// Get user_id from session
+$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
-// ตรวจสอบว่ามีข้อมูลหรือไม่
+// Build SQL query based on role
+if (isset($_SESSION['role_id']) && $_SESSION['role_id'] == 3) {
+    // For role_id 3, filter tasks for the current user
+    $sql = "SELECT task_id, start_date, end_date, floor_id FROM task WHERE user_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $user_id);
+} else {
+    // For other roles, get all tasks
+    $sql = "SELECT task_id, start_date, end_date, floor_id FROM task";
+    $stmt = $conn->prepare($sql);
+}
+
+// Execute the query
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Check if there are results
 if ($result->num_rows > 0) {
     $tasks = array();
-    // วนลูปเพื่อดึงข้อมูลทั้งหมดและสร้าง array ของกิจกรรม
+    // Loop through results and build event array
     while ($row = $result->fetch_assoc()) {
-        // กำหนดรูปแบบของกิจกรรมเพื่อให้รับรู้ได้ถูกต้องโดย FullCalendar
         $event = array();
         $event['id'] = $row['task_id'];
         $event['start'] = $row['start_date'];
         $event['end'] = $row['end_date'];
         $event['floor_id'] = $row['floor_id'];
 
-        // เพิ่มกิจกรรมเข้าใน array ที่เก็บข้อมูลกิจกรรมทั้งหมด
         array_push($tasks, $event);
     }
-    // แปลง array ของกิจกรรมเป็นรูปแบบ JSON และส่งกลับ
+    // Output tasks in JSON format
     echo json_encode($tasks);
 } else {
-    // ถ้าไม่มีข้อมูล ส่งกลับเป็น array ว่าง
+    // No tasks found
     echo json_encode(array());
 }
 
-// ปิดการเชื่อมต่อกับฐานข้อมูล
+// Close connection
 $conn->close();
 ?>

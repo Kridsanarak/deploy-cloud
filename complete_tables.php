@@ -15,7 +15,7 @@ if (!isset($_SESSION['role_id']) || !isset($_SESSION['user_id'])) {
     exit;
 }
 
-// กำหนดค่าตัวแปร $role_id และ $current_user_id จาก Session
+// กำหนดค่าตัวแปร $role_id จาก Session
 $role_id = $_SESSION['role_id'];
 $current_user_id = $_SESSION['user_id'];
 
@@ -57,11 +57,10 @@ include 'includes/calendar.php';
             die("การเชื่อมต่อล้มเหลว: " . $conn->connect_error);
         }
 
-// สร้างคำสั่ง SQL เพื่อดึงข้อมูลเฉพาะช่วงวันที่ที่กำหนด
-$today = date('Y-m-d');
-$nextWeek = date('Y-m-d', strtotime('+7 days'));
+        // สร้างคำสั่ง SQL เพื่อดึงข้อมูลเฉพาะที่มี end_date ก่อนวันนี้
+        $today = date('Y-m-d');
 
-$sql = "SELECT 
+        $sql = "SELECT 
     t.task_id,
     t.start_date,
     t.end_date,
@@ -77,16 +76,15 @@ $sql = "SELECT
 FROM task t
 INNER JOIN users u ON t.user_id = u.user_id
 LEFT JOIN room r ON t.room_id = r.room_id
-WHERE t.start_date >= '$today' AND t.start_date <= '$nextWeek'
+WHERE t.end_date < '$today'
 AND t.user_id = $current_user_id
-ORDER BY t.start_date ASC";
-        
+ORDER BY t.end_date ASC";
+
         $result = $conn->query($sql);
 
         if ($result === false) {
             die('Error: ' . $conn->error);
         }
-        
 
         if ($result->num_rows > 0) {
             echo '<div class="card-body">';
@@ -106,60 +104,50 @@ ORDER BY t.start_date ASC";
             echo '</tr>';
             echo '</thead>';
             echo '<tbody>';
-        
+
             while ($row = $result->fetch_assoc()) {
                 // แปลงค่า ID เป็นข้อความที่อ่านได้
-                $status = '';
-                switch ($row['status_id']) {
-                    case 1:
-                        $status = 'Ready';
-                        break;
-                    case 2:
-                        $status = 'Not Ready';
-                        break;
-                    case 3:
-                        $status = 'Waiting';
-                        break;
-                    default:
-                        $status = '-';
+                if ($row['status_id'] == 1) {
+                    $status = 'Ready';
+                } elseif ($row['status_id'] == 2) {
+                    $status = 'Not Ready';
+                } elseif ($row['status_id'] == 3) {
+                    $status = 'Waiting';
+                } else {
+                    $status = '-';
                 }
 
-                $toilet_gender = '';
-                switch ($row['toilet_gender_id']) {
-                    case 1:
-                        $toilet_gender = 'Male';
-                        break;
-                    case 2:
-                        $toilet_gender = 'Female';
-                        break;
-                    case 3:
-                        $toilet_gender = 'Both';
-                        break;
-                    default:
-                        $toilet_gender = '-';
+                if ($row['toilet_gender_id'] == 1) {
+                    $toilet_gender = 'Male';
+                } elseif ($row['toilet_gender_id'] == 2) {
+                    $toilet_gender = 'Female';
+                } elseif ($row['toilet_gender_id'] == 3) {
+                    $toilet_gender = 'Both';
+                } else {
+                    $toilet_gender = '-';
                 }
 
-                $toilet_status = '';
-                switch ($row['toilet_status_id']) {
-                    case 1:
-                        $toilet_status = 'Ready';
-                        break;
-                    case 2:
-                        $toilet_status = 'Not Ready';
-                        break;
-                    case 3:
-                        $toilet_status = 'Waiting';
-                        break;
-                    default:
-                        $toilet_status = '-';
+                if ($row['toilet_status_id'] == 1) {
+                    $toilet_status = 'Ready';
+                } elseif ($row['toilet_status_id'] == 2) {
+                    $toilet_status = 'Not Ready';
+                } elseif ($row['toilet_status_id'] == 3) {
+                    $toilet_status = 'Waiting';
+                } else {
+                    $toilet_status = '-';
                 }
-        
+
                 echo '<tr>';
                 echo '<td>' . ($row["start_date"] ?? '-') . '</td>';
                 echo '<td>' . ($row["end_date"] ?? '-') . '</td>';
                 echo '<td>' . ($row["user_fullname"] ?? '-') . '</td>';
-                echo '<td>IF-' . ($row["floor_id"] ?? '-') . '</td>';
-                echo '<td>' . ($row["room_name"] ?? '-') . '</td>';
+                echo '<td>' . ($row["floor_id"] ?? '-') . '</td>';
+                // ตรวจสอบค่า room_id และแสดง room_name หรือ -
+                if (is_null($row["room_id"])) {
+                    echo '<td>-</td>';
+                } else {
+                    echo '<td>' . ($row["room_name"] ?? '-') . '</td>';
+                }
                 echo '<td>' . $status . '</td>';
                 echo '<td>' . $toilet_gender . '</td>';
                 echo '<td>' . $toilet_status . '</td>';
@@ -167,7 +155,7 @@ ORDER BY t.start_date ASC";
                 echo '<button type="button" class="btn btn-info btn-circle btn-sm" data-toggle="modal" data-target="#imageModal' . $row["task_id"] . '"><i class="fas fa-image"></i></button>';
                 echo '</td>';
                 echo '</tr>';
-        
+
                 // Modal สำหรับแสดงรูปภาพ
                 echo '<div class="modal fade" id="imageModal' . $row["task_id"] . '" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel' . $row["task_id"] . '" aria-hidden="true">';
                 echo '<div class="modal-dialog modal-dialog-centered" role="document">';
@@ -194,22 +182,24 @@ ORDER BY t.start_date ASC";
                 echo '</div>';
                 echo '</div>';
             }
-        
+
             echo '</tbody>';
             echo '</table>';
             echo '</div>';
             echo '</div>';
         } else {
             echo "<div class='card-body'>";
-            echo "<p class='text-center'>คุณไม่มีงานที่กำหนดไว้ในเดือนนี้</p>";
+            echo "<p class='text-center'>You have no tasks that have already passed.</p>";
             echo "</div>";
         }
-        
+
         // ปิดการเชื่อมต่อกับฐานข้อมูล
         $conn->close();
         ?>
-    </div>
 
+
+
+    </div>
 </div>
 <!-- /.container-fluid -->
 
@@ -227,16 +217,27 @@ ORDER BY t.start_date ASC";
     <i class="fas fa-angle-up"></i>
 </a>
 
+<!-- Logout Modal-->
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <a class="btn btn-primary" href="index.php">Logout</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="vendor/jquery/jquery.min.js"></script>
-<script>
-    $(document).ready(function () {
-        // เมื่อมีการเลือกไฟล์
-        $('.custom-file-input').on('change', function () {
-            var fileName = $(this).val().split('\\').pop(); // ดึงชื่อไฟล์ออกมาจาก path
-            $(this).next('.custom-file-label').html(fileName); // แสดงชื่อไฟล์ใน label
-        });
-    });
-</script>
 
 <?php
 include 'includes/scripts.php';

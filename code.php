@@ -8,7 +8,7 @@ if (isset($_POST['registerbtn'])) {
     $servername = "localhost";
     $username = "root";
     $password = "";
-    $dbname = "project";
+    $dbname = "project_maidmanage";
 
     $connection = new mysqli($servername, $username, $password, $dbname);
 
@@ -24,15 +24,9 @@ if (isset($_POST['registerbtn'])) {
     $role_id = $_POST['role_id'];
     $status_id = $_POST['status_id'];
 
-    // แปลง timestamp เป็นรูปแบบวันที่และเวลาที่ต้องการ
-    $formatted_date = date("Y-m-d H:i:s", $timestamp);
-
-    // ดึงค่า timestamp ปัจจุบัน
-    $timestamp = time();
-
     // ใช้ Prepared Statements
-    $stmt = $connection->prepare("INSERT INTO users (fullname, username, password, role_id, status_id, timestamp) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssss", $fullname, $username, $password, $role_id, $status_id, $timestamp);
+    $stmt = $connection->prepare("INSERT INTO users (fullname, username, password, role_id, status_id) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssss", $fullname, $username, $password, $role_id, $status_id);
 
     if ($stmt->execute()) {
         $_SESSION['status'] = "User added successfully!";
@@ -56,7 +50,7 @@ if (isset($_POST['deleteUserId'])) {
     $servername = "localhost";
     $username = "root";
     $password = "";
-    $dbname = "project";
+    $dbname = "project_maidmanage";
 
     $connection = new mysqli($servername, $username, $password, $dbname);
 
@@ -99,7 +93,7 @@ if (isset($_POST['add_task_btn'])) {
     $servername = "localhost";
     $username = "root";
     $password = "";
-    $dbname = "project";
+    $dbname = "project_maidmanage";
 
     $connection = new mysqli($servername, $username, $password, $dbname);
 

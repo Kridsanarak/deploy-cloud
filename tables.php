@@ -41,160 +41,160 @@ include 'includes/calendar.php';
             <h6 class="m-0 font-weight-bold text-primary">DataTables</h6>
         </div>
         <?php
-        date_default_timezone_set('Asia/Bangkok');
-        // การกำหนดค่าในการเชื่อมต่อฐานข้อมูล
-        $servername = "localhost";
-        $username = "root";
-        $password = "";
-        $dbname = "project";
+date_default_timezone_set('Asia/Bangkok');
+// การกำหนดค่าในการเชื่อมต่อฐานข้อมูล
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "project_maidmanage";
 
-        // การเชื่อมต่อกับ MySQL
-        $conn = new mysqli($servername, $username, $password, $dbname);
+// การเชื่อมต่อกับ MySQL
+$conn = new mysqli($servername, $username, $password, $dbname);
 
-        // ตรวจสอบการเชื่อมต่อ
-        if ($conn->connect_error) {
-            die("การเชื่อมต่อล้มเหลว: " . $conn->connect_error);
-        }
+// ตรวจสอบการเชื่อมต่อ
+if ($conn->connect_error) {
+    die("การเชื่อมต่อล้มเหลว: " . $conn->connect_error);
+}
 
-        // สร้างคำสั่ง SQL เพื่อดึงข้อมูลเฉพาะเดือนปัจจุบัน
-        $currentMonth = date('m');
-        $currentYear = date('Y');
-        $sql = "SELECT 
-            t.task_id,
-            t.start_date,
-            t.end_date,
-            t.user_id,
-            t.floor_id,
-            t.room_id,
-            t.status_id,
-            t.toilet_gender_id,
-            t.toilet_status_id,
-            t.image,
-            u.fullname AS user_fullname,
-            r.room_name
-        FROM task t
-        INNER JOIN users u ON t.user_id = u.user_id
-        LEFT JOIN room r ON t.room_id = r.room_id
-        WHERE MONTH(t.start_date) = $currentMonth AND YEAR(t.start_date) = $currentYear
-        ORDER BY t.start_date ASC";
+// สร้างคำสั่ง SQL เพื่อดึงข้อมูลเฉพาะช่วงวันที่ที่กำหนด
+$today = date('Y-m-d');
+$nextWeek = date('Y-m-d', strtotime('+7 days'));
 
-        $result = $conn->query($sql);
+$sql = "SELECT 
+    t.task_id,
+    t.start_date,
+    t.end_date,
+    t.user_id,
+    t.floor_id,
+    t.room_id,
+    t.status_id,
+    t.toilet_gender_id,
+    t.toilet_status_id,
+    t.image,
+    u.fullname AS user_fullname,
+    r.room_name
+FROM task t
+INNER JOIN users u ON t.user_id = u.user_id
+LEFT JOIN room r ON t.room_id = r.room_id
+WHERE t.start_date >= '$today' AND t.start_date <= '$nextWeek'
+ORDER BY t.start_date ASC";
 
-        if ($result === false) {
-            die('Error: ' . $conn->error);
-        }
+$result = $conn->query($sql);
 
+if ($result === false) {
+    die('Error: ' . $conn->error);
+}
 
-        if ($result->num_rows > 0) {
-            echo '<div class="card-body">';
-            echo '<div class="table-responsive">';
-            echo '<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">';
-            echo '<thead>';
-            echo '<tr>';
-            echo '<th>Start Date</th>';
-            echo '<th>End Date</th>';
-            echo '<th>User</th>';
-            echo '<th>Floor</th>';
-            echo '<th>Room</th>';
-            echo '<th>Status</th>';
-            echo '<th>Toilet Gender</th>';
-            echo '<th>Toilet Status</th>';
-            echo '<th>Action</th>';
-            echo '</tr>';
-            echo '</thead>';
-            echo '<tbody>';
+if ($result->num_rows > 0) {
+    echo '<div class="card-body">';
+    echo '<div class="table-responsive">';
+    echo '<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">';
+    echo '<thead>';
+    echo '<tr>';
+    echo '<th>Start Date</th>';
+    echo '<th>End Date</th>';
+    echo '<th>User</th>';
+    echo '<th>Floor</th>';
+    echo '<th>Room</th>';
+    echo '<th>Status</th>';
+    echo '<th>Toilet Gender</th>';
+    echo '<th>Toilet Status</th>';
+    echo '<th>Action</th>';
+    echo '</tr>';
+    echo '</thead>';
+    echo '<tbody>';
 
-            while ($row = $result->fetch_assoc()) {
-                // แปลงค่า ID เป็นข้อความที่อ่านได้
-                if ($row['status_id'] == 1) {
-                    $status = 'Ready';
-                } elseif ($row['status_id'] == 2) {
-                    $status = 'Not Ready';
-                } elseif ($row['status_id'] == 3) {
-                    $status = 'Waiting';
-                } else {
-                    $status = '-';
-                }
-
-                if ($row['toilet_gender_id'] == 1) {
-                    $toilet_gender = 'Male';
-                } elseif ($row['toilet_gender_id'] == 2) {
-                    $toilet_gender = 'Female';
-                } elseif ($row['toilet_gender_id'] == 3) {
-                    $toilet_gender = 'Both';
-                } else {
-                    $toilet_gender = '-';
-                }
-
-                if ($row['toilet_status_id'] == 1) {
-                    $toilet_status = 'Ready';
-                } elseif ($row['toilet_status_id'] == 2) {
-                    $toilet_status = 'Not Ready';
-                } elseif ($row['toilet_status_id'] == 3) {
-                    $toilet_status = 'Waiting';
-                } else {
-                    $toilet_status = '-';
-                }
-
-                echo '<tr>';
-                echo '<td>' . ($row["start_date"] ?? '-') . '</td>';
-                echo '<td>' . ($row["end_date"] ?? '-') . '</td>';
-                echo '<td>' . ($row["user_fullname"] ?? '-') . '</td>';
-                echo '<td>' . ($row["floor_id"] ?? '-') . '</td>';
-                // ตรวจสอบค่า room_id และแสดง room_name หรือ -
-                if (is_null($row["room_id"])) {
-                    echo '<td>-</td>';
-                } else {
-                    echo '<td>' . ($row["room_name"] ?? '-') . '</td>';
-                }
-                echo '<td>' . $status . '</td>';
-                echo '<td>' . $toilet_gender . '</td>';
-                echo '<td>' . $toilet_status . '</td>';
-                echo '<td>';
-                echo '<button type="button" class="btn btn-info btn-circle btn-sm" data-toggle="modal" data-target="#imageModal' . $row["task_id"] . '"><i class="fas fa-image"></i></button>';
-                echo '</td>';
-                echo '</tr>';
-
-                // Modal สำหรับแสดงรูปภาพ
-                echo '<div class="modal fade" id="imageModal' . $row["task_id"] . '" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel' . $row["task_id"] . '" aria-hidden="true">';
-                echo '<div class="modal-dialog modal-dialog-centered" role="document">';
-                echo '<div class="modal-content">';
-                echo '<div class="modal-header">';
-                echo '<h5 class="modal-title" id="imageModalLabel' . $row["task_id"] . '">Image Preview</h5>';
-                echo '<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
-                echo '<span aria-hidden="true">&times;</span>';
-                echo '</button>';
-                echo '</div>';
-                echo '<div class="modal-body">';
-                if (!empty($row["image"])) {
-                    $upload_dir = "upload/";
-                    $image_path = $upload_dir . $row["image"];
-                    echo '<img src="' . $image_path . '" class="img-fluid" alt="Image">';
-                } else {
-                    echo 'No Image Available';
-                }
-                echo '</div>';
-                echo '<div class="modal-footer">';
-                echo '<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>';
-                echo '</div>';
-                echo '</div>';
-                echo '</div>';
-                echo '</div>';
-            }
-
-            echo '</tbody>';
-            echo '</table>';
-            echo '</div>';
-            echo '</div>';
+    while ($row = $result->fetch_assoc()) {
+        // แปลงค่า ID เป็นข้อความที่อ่านได้
+        if ($row['status_id'] == 1) {
+            $status = 'Ready';
+        } elseif ($row['status_id'] == 2) {
+            $status = 'Not Ready';
+        } elseif ($row['status_id'] == 3) {
+            $status = 'Waiting';
         } else {
-            echo "<div class='card-body'>";
-            echo "<p class='text-center'>You have no tasks scheduled for this month.</p>";
-            echo "</div>";
+            $status = '-';
         }
 
-        // ปิดการเชื่อมต่อกับฐานข้อมูล
-        $conn->close();
-        ?>
+        if ($row['toilet_gender_id'] == 1) {
+            $toilet_gender = 'Male';
+        } elseif ($row['toilet_gender_id'] == 2) {
+            $toilet_gender = 'Female';
+        } elseif ($row['toilet_gender_id'] == 3) {
+            $toilet_gender = 'Both';
+        } else {
+            $toilet_gender = '-';
+        }
+
+        if ($row['toilet_status_id'] == 1) {
+            $toilet_status = 'Ready';
+        } elseif ($row['toilet_status_id'] == 2) {
+            $toilet_status = 'Not Ready';
+        } elseif ($row['toilet_status_id'] == 3) {
+            $toilet_status = 'Waiting';
+        } else {
+            $toilet_status = '-';
+        }
+
+        echo '<tr>';
+        echo '<td>' . ($row["start_date"] ?? '-') . '</td>';
+        echo '<td>' . ($row["end_date"] ?? '-') . '</td>';
+        echo '<td>' . ($row["user_fullname"] ?? '-') . '</td>';
+        echo '<td>' . ($row["floor_id"] ?? '-') . '</td>';
+        // ตรวจสอบค่า room_id และแสดง room_name หรือ -
+        if (is_null($row["room_id"])) {
+            echo '<td>-</td>';
+        } else {
+            echo '<td>' . ($row["room_name"] ?? '-') . '</td>';
+        }
+        echo '<td>' . $status . '</td>';
+        echo '<td>' . $toilet_gender . '</td>';
+        echo '<td>' . $toilet_status . '</td>';
+        echo '<td>';
+        echo '<button type="button" class="btn btn-info btn-circle btn-sm" data-toggle="modal" data-target="#imageModal' . $row["task_id"] . '"><i class="fas fa-image"></i></button>';
+        echo '</td>';
+        echo '</tr>';
+
+        // Modal สำหรับแสดงรูปภาพ
+        echo '<div class="modal fade" id="imageModal' . $row["task_id"] . '" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel' . $row["task_id"] . '" aria-hidden="true">';
+        echo '<div class="modal-dialog modal-dialog-centered" role="document">';
+        echo '<div class="modal-content">';
+        echo '<div class="modal-header">';
+        echo '<h5 class="modal-title" id="imageModalLabel' . $row["task_id"] . '">Image Preview</h5>';
+        echo '<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
+        echo '<span aria-hidden="true">&times;</span>';
+        echo '</button>';
+        echo '</div>';
+        echo '<div class="modal-body">';
+        if (!empty($row["image"])) {
+            $upload_dir = "upload/";
+            $image_path = $upload_dir . $row["image"];
+            echo '<img src="' . $image_path . '" class="img-fluid" alt="Image">';
+        } else {
+            echo 'No Image Available';
+        }
+        echo '</div>';
+        echo '<div class="modal-footer">';
+        echo '<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>';
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+    }
+
+    echo '</tbody>';
+    echo '</table>';
+    echo '</div>';
+    echo '</div>';
+} else {
+    echo "<div class='card-body'>";
+    echo "<p class='text-center'>You have no tasks scheduled for the next 7 days.</p>";
+    echo "</div>";
+}
+
+// ปิดการเชื่อมต่อกับฐานข้อมูล
+$conn->close();
+?>
 
     </div>
 </div>
