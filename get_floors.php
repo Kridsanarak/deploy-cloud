@@ -12,19 +12,19 @@ if ($conn->connect_error) {
     die("การเชื่อมต่อล้มเหลว: " . $conn->connect_error);
 }
 
-$floor_id = isset($_GET['floor_id']) ? intval($_GET['floor_id']) : 0;
+$user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : 0;
 
-if ($floor_id) {
-    $sql = "SELECT room_id, room_name FROM room WHERE floor_id = $floor_id";
+if ($user_id) {
+    $sql = "SELECT DISTINCT floor_id, floor_name FROM floors WHERE user_id = $user_id";
     $result = $conn->query($sql);
     
-    $rooms = [];
+    $floors = [];
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            $rooms[] = $row;
+            $floors[] = $row;
         }
     }
-    echo json_encode($rooms);
+    echo json_encode($floors);
 } else {
     echo json_encode([]);
 }

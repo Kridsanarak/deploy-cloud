@@ -39,7 +39,7 @@ include 'includes/calendar.php';
     <!-- DataTales Example -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Complete Work</h6>
+            <h6 class="m-0 font-weight-bold text-primary">DataTables</h6>
         </div>
         <?php
         date_default_timezone_set('Asia/Bangkok');
@@ -173,7 +173,11 @@ include 'includes/calendar.php';
                 echo '<td>' . $toilet_gender . '</td>';
                 echo '<td>' . $toilet_status . '</td>';
                 echo '<td>';
-                echo '<button type="button" class="btn btn-info btn-circle btn-sm" data-toggle="modal" data-target="#imageModal' . $row["task_id"] . '"><i class="fas fa-image"></i></button>';
+                if (!empty($row["image"])) {
+                    echo '<button type="button" class="btn btn-info btn-circle btn-sm" data-toggle="modal" data-target="#imageModal' . $row["task_id"] . '"><i class="fas fa-image"></i></button>';
+                } else {
+                    echo '<button type="button" class="btn btn-secondary btn-circle btn-sm" disabled><i class="fas fa-image"></i></button>';
+                }
                 echo '</td>';
                 echo '</tr>';
 

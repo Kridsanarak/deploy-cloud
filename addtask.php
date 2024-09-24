@@ -48,26 +48,34 @@ include 'includes/calendar.php';
                     <select name="user_id" class="form-control" required>
                         <option value="">--- Please select ---</option>
                         <?php
-                        // Database connection
                         $servername = "localhost";
                         $username = "root";
                         $password = "";
                         $dbname = "project_maidmanage";
+
+                        // Database connection and fetching users
                         $conn = new mysqli($servername, $username, $password, $dbname);
+
                         // Check connection
                         if ($conn->connect_error) {
                             die("Connection failed: " . $conn->connect_error);
                         }
-                        // SQL query to retrieve all users except user_id 1
+
                         $sql = "SELECT * FROM users WHERE role_id != '1' AND status_id = '1'";
                         $result = mysqli_query($conn, $sql);
-                        // Loop through all users and display as options
-                        while ($row = mysqli_fetch_assoc($result)) {
-                            echo '<option value="' . $row['user_id'] . '">' . $row['fullname'] . '</option>';
+
+                        if (mysqli_num_rows($result) > 0) {
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                echo '<option value="' . $row['user_id'] . '">' . $row['fullname'] . '</option>';
+                            }
+                        } else {
+                            echo '<option value="">No users available</option>';
                         }
+
                         // Close connection
                         $conn->close();
                         ?>
+
                     </select>
                 </div>
 
@@ -75,16 +83,17 @@ include 'includes/calendar.php';
                 <div class="form-group">
                     <label>Start Date</label>
                     <input type="date" name="start_date" class="form-control" required min="<?php
-                    date_default_timezone_set('Asia/Bangkok');
-                    echo date('Y-m-d'); ?>">
+                                                                                            date_default_timezone_set('Asia/Bangkok');
+                                                                                            echo date('Y-m-d'); ?>">
                 </div>
 
                 <!-- End Date -->
                 <div class="form-group">
                     <label>End Date</label>
-                    <input type="date" name="end_date" class="form-control" required min="<?php
-                    date_default_timezone_set('Asia/Bangkok');
-                    echo date('Y-m-d'); ?>">
+                    <input type="date" name="end_date" class="form-control" required
+                        min="<?php
+                                date_default_timezone_set('Asia/Bangkok');
+                                echo date('Y-m-d', strtotime('+1 day')); ?>">
                 </div>
 
                 <!-- Floor Number -->
@@ -159,14 +168,14 @@ include 'includes/calendar.php';
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         var floorSelect = document.getElementById('floor_id');
         var roomSelect = document.getElementById('room_id');
 
         // Disable the roomSelect initially
         roomSelect.disabled = true;
 
-        floorSelect.addEventListener('change', function () {
+        floorSelect.addEventListener('change', function() {
             var floorId = this.value;
             if (floorId && floorId !== '1' && floorId !== '9') {
                 fetch('get_rooms.php?floor_id=' + floorId)

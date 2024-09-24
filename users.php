@@ -162,7 +162,11 @@ include 'includes/calendar.php';
                 echo '<td>' . htmlspecialchars($row["fullname"], ENT_QUOTES, 'UTF-8') . '</td>';
                 echo '<td>' . htmlspecialchars($row["username"], ENT_QUOTES, 'UTF-8') . '</td>';
                 echo '<td>' . $role . '</td>';
-                echo '<td>' . htmlspecialchars($row["timestamp"], ENT_QUOTES, 'UTF-8') . '</td>';
+                if (empty($row["timestamp"])) {
+                    echo '<td>New User</td>'; // Display "New User" if timestamp is empty or null
+                } else {
+                    echo '<td>' . htmlspecialchars($row["timestamp"], ENT_QUOTES, 'UTF-8') . '</td>';
+                }
                 echo '<td>' . $status . '</td>';
                 echo '<td>
                     <button class="btn btn-primary btn-circle btn-sm mr-1" data-toggle="modal" data-target="#editadminprofile' . $row["user_id"] . '"><i class="fas fa-edit"></i></button>
@@ -201,7 +205,7 @@ include 'includes/calendar.php';
                 echo '<select name="role_id" class="form-control">';
                 echo '<option value="1" ' . ($row["role_id"] == 1 ? "selected" : "") . '>Admin</option>';
                 echo '<option value="2" ' . ($row["role_id"] == 2 ? "selected" : "") . '>Headmaid</option>';
-                echo '<option value="3" ' . ($row["role_id"] == 3 ? "selected" : "") . '>Maid</option>';         
+                echo '<option value="3" ' . ($row["role_id"] == 3 ? "selected" : "") . '>Maid</option>';
                 echo '</select>';
                 echo '</div>';
                 echo '<div class="form-group">';

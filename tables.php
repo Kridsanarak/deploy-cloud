@@ -151,8 +151,11 @@ if ($result->num_rows > 0) {
         echo '<td>' . $toilet_gender . '</td>';
         echo '<td>' . $toilet_status . '</td>';
         echo '<td>';
-        echo '<button type="button" class="btn btn-info btn-circle btn-sm" data-toggle="modal" data-target="#imageModal' . $row["task_id"] . '"><i class="fas fa-image"></i></button>';
-        echo '</td>';
+        if (!empty($row["image"])) {
+            echo '<button type="button" class="btn btn-info btn-circle btn-sm" data-toggle="modal" data-target="#imageModal' . $row["task_id"] . '"><i class="fas fa-image"></i></button>';
+        } else {
+            echo '<button type="button" class="btn btn-secondary btn-circle btn-sm" disabled><i class="fas fa-image"></i></button>';
+        }        echo '</td>';
         echo '</tr>';
 
         // Modal สำหรับแสดงรูปภาพ

@@ -24,9 +24,15 @@ if (isset($_POST['registerbtn'])) {
     $role_id = $_POST['role_id'];
     $status_id = $_POST['status_id'];
 
+    // แปลง timestamp เป็นรูปแบบวันที่และเวลาที่ต้องการ
+    $formatted_date = date("Y-m-d H:i:s", $timestamp);
+
+    // ดึงค่า timestamp ปัจจุบัน
+    $timestamp = time();
+
     // ใช้ Prepared Statements
-    $stmt = $connection->prepare("INSERT INTO users (fullname, username, password, role_id, status_id) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssss", $fullname, $username, $password, $role_id, $status_id);
+    $stmt = $connection->prepare("INSERT INTO users (fullname, username, password, role_id, status_id, timestamp) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssss", $fullname, $username, $password, $role_id, $status_id, $timestamp);
 
     if ($stmt->execute()) {
         $_SESSION['status'] = "User added successfully!";
@@ -140,6 +146,70 @@ if (isset($_POST['add_task_btn'])) {
 
     // เปลี่ยนเส้นทางกลับไปที่หน้าแรก
     header('Location: main.php');
+}
+
+if (isset($_POST['send_task_btn'])) {
+    // Connect to the database
+    $servername = "localhost";
+    $username = "root";
+    $password = "";
+    $dbname = "project_maidmanage";
+
+    $connection = new mysqli($servername, $username, $password, $dbname);
+
+    // Check connection
+    if ($connection->connect_error) {
+        die("Connection failed: " . $connection->connect_error);
+    }
+
+    // Get data from the form
+    $task_id = $_POST['task_id'];
+    $status_id = !empty($_POST['status_id']) ? $_POST['status_id'] : null; 
+    $toilet_status_id = !empty($_POST['toilet_status_id']) ? $_POST['toilet_status_id'] : null; 
+
+    // Initialize image variable
+    $image = '';
+
+    // Check if an image has been uploaded
+    if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+        $image = $_FILES['image']['name'];
+        $target_dir = "upload/"; // Ensure this directory exists
+        $target_file = $target_dir . basename($image);
+        
+        // Move uploaded file to target directory
+        if (move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
+            // File uploaded successfully
+        } else {
+            // Handle file upload error
+            $_SESSION['status'] = "Failed to upload image.";
+            $_SESSION['status_code'] = "error";
+            header('Location: send.php'); // Redirect
+            exit;
+        }
+    }
+
+    // SQL query to update the task
+    $sql = "UPDATE task SET status_id='$status_id', toilet_status_id='$toilet_status_id'";
+    
+    // Include image in the query if uploaded
+    if (!empty($image)) {
+        $sql .= ", image='$image'"; // Add image to the update
+    }
+    
+    $sql .= " WHERE task_id=$task_id"; // Complete the query
+
+    // Execute the query and check for success
+    if ($connection->query($sql) === TRUE) {
+        $_SESSION['status'] = "Task updated successfully!";
+        $_SESSION['status_code'] = "success";
+    } else {
+        $_SESSION['status'] = "Failed to update task: " . $connection->error;
+        $_SESSION['status_code'] = "error";
+    }
+
+    $connection->close(); // Close database connection
+
+    header('Location: send.php'); // Redirect
 }
 
 

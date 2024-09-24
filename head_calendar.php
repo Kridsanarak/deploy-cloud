@@ -328,11 +328,12 @@ if ($result_floor_user && $result_floor_user->num_rows > 0) {
                                 }
                                 echo '<br>';
 
-                                // แสดงภาพหากมี
                                 if (!empty($row["image"])) {
-                                    echo '<img src="' . $row["image"] . '" alt="Image" style="width: 100px; height: auto;">';
+                                    $upload_dir = "upload/";
+                                    $image_path = $upload_dir . $row["image"];
+                                    echo '<img src="' . $image_path . '" class="img-thumbnail" alt="Image" style="max-width: 100px; max-height: 100px;">';
                                 } else {
-                                    echo 'ไม่มีภาพ';
+                                    echo 'No Image';
                                 }
                                 echo '</p>';
                                 echo '</div>';
