@@ -34,36 +34,22 @@ include 'includes/calendar.php';
 
 <!-- Begin Page Content -->
 <div class="container-fluid">
-    <!-- Page Heading -->
     <h1 class="h3 mb-2 text-gray-800">Add Task</h1>
 
-    <!-- Form for adding tasks -->
     <form action="code.php" method="POST">
         <div class="row">
-            <!-- First Half of the Form -->
             <div class="col-md-6">
-                <!-- Assign User -->
                 <div class="form-group">
                     <label>Assign User</label>
                     <select name="user_id" class="form-control" required>
                         <option value="">--- Please select ---</option>
                         <?php
-                        $servername = "localhost";
-                        $username = "root";
-                        $password = "";
-                        $dbname = "project_maidmanage";
-
-                        // Database connection and fetching users
-                        $conn = new mysqli($servername, $username, $password, $dbname);
-
-                        // Check connection
+                        $conn = new mysqli("localhost", "root", "", "project_maidmanage");
                         if ($conn->connect_error) {
                             die("Connection failed: " . $conn->connect_error);
                         }
-
                         $sql = "SELECT * FROM users WHERE role_id != '1' AND status_id = '1'";
                         $result = mysqli_query($conn, $sql);
-
                         if (mysqli_num_rows($result) > 0) {
                             while ($row = mysqli_fetch_assoc($result)) {
                                 echo '<option value="' . $row['user_id'] . '">' . $row['fullname'] . '</option>';
@@ -71,58 +57,32 @@ include 'includes/calendar.php';
                         } else {
                             echo '<option value="">No users available</option>';
                         }
-
-                        // Close connection
                         $conn->close();
                         ?>
-
                     </select>
                 </div>
 
-                <!-- Start Date -->
                 <div class="form-group">
-                    <label>Start Date</label>
-                    <input type="date" name="start_date" class="form-control" required min="<?php
-                                                                                            date_default_timezone_set('Asia/Bangkok');
-                                                                                            echo date('Y-m-d'); ?>">
+                    <label>Date</label>
+                    <input type="date" name="task_date" class="form-control" required min="<?php echo date('Y-m-d'); ?>">
                 </div>
 
-                <!-- End Date -->
-                <div class="form-group">
-                    <label>End Date</label>
-                    <input type="date" name="end_date" class="form-control" required
-                        min="<?php
-                                date_default_timezone_set('Asia/Bangkok');
-                                echo date('Y-m-d', strtotime('+1 day')); ?>">
-                </div>
 
-                <!-- Floor Number -->
                 <div class="form-group">
                     <label>Floor Number</label>
-                    <select id="floor_id" name="floor_id" class="form-control" required>
-                        <option value="">--- Please select ---</option>
+                    <div class="row">
                         <?php
-                        // Display options for floor numbers
                         for ($i = 1; $i <= 11; $i++) {
-                            echo '<option value="' . $i . '">' . $i . '</option>';
+                            echo '<div class="col-3">';
+                            echo '<div class="form-check">';
+                            echo '<input class="form-check-input" type="checkbox" name="floor_id[]" value="' . $i . '" id="floor_' . $i . '" onchange="fetchRooms()">';
+                            echo '<label class="form-check-label" for="floor_' . $i . '">Floor ' . $i . '</label>';
+                            echo '</div>';
+                            echo '</div>';
                         }
                         ?>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Second Half of the Form -->
-            <div class="col-md-6">
-                <!-- Room Number -->
-                <div class="form-group">
-                    <label>Room Number</label>
-                    <select id="room_id" name="room_id" class="form-control">
-                        <option value="">--- Please select ---</option>
-                    </select>
-                </div>
-
-                <!-- Room Status -->
-                <div class="form-group">
+                    </div>
+                    <div class="form-group">
                     <label>Room Status</label>
                     <select name="status_id" class="form-control">
                         <option value="">--- Please select ---</option>
@@ -132,18 +92,6 @@ include 'includes/calendar.php';
                     </select>
                 </div>
 
-                <!-- Toilet Gender -->
-                <div class="form-group">
-                    <label>Toilet Gender</label>
-                    <select name="toilet_gender_id" class="form-control">
-                        <option value="">--- Please select ---</option>
-                        <option value="1">Male</option>
-                        <option value="2">Female</option>
-                        <option value="3">Both</option>
-                    </select>
-                </div>
-
-                <!-- Toilet Status -->
                 <div class="form-group">
                     <label>Toilet Status</label>
                     <select name="toilet_status_id" class="form-control">
@@ -153,52 +101,70 @@ include 'includes/calendar.php';
                         <option value="3">Not Ready</option>
                     </select>
                 </div>
+
+                </div>
             </div>
 
+            <div class="col-md-6">
+                <div id="roomSelections"></div>
 
+                
+            </div>
         </div>
-</div>
 
-<!-- Submit Button -->
-<div class="modal-footer">
-    <button type="submit" name="add_task_btn" class="btn btn-primary">Add Task</button>
-</div>
-</form>
-
+        <div class="modal-footer">
+            <button type="submit" name="add_task_btn" class="btn btn-primary">Add Task</button>
+        </div>
+    </form>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var floorSelect = document.getElementById('floor_id');
-        var roomSelect = document.getElementById('room_id');
+function fetchRooms() {
+    var selectedFloors = Array.from(document.querySelectorAll('input[name="floor_id[]"]:checked')).map(input => input.value);
+    var roomSelections = document.getElementById('roomSelections');
 
-        // Disable the roomSelect initially
-        roomSelect.disabled = true;
+    roomSelections.innerHTML = '';
 
-        floorSelect.addEventListener('change', function() {
-            var floorId = this.value;
-            if (floorId && floorId !== '1' && floorId !== '9') {
-                fetch('get_rooms.php?floor_id=' + floorId)
-                    .then(response => response.json())
-                    .then(data => {
-                        roomSelect.innerHTML = '<option value="">--- Please select ---</option>';
-                        data.forEach(room => {
-                            var option = document.createElement('option');
-                            option.value = room.room_id;
-                            option.textContent = room.room_name;
-                            roomSelect.appendChild(option);
-                        });
-                        // Enable the roomSelect when there are options
-                        roomSelect.disabled = false;
-                    })
-                    .catch(error => console.error('Error fetching rooms:', error));
-            } else {
-                roomSelect.innerHTML = '<option value="">--- Please select ---</option>';
-                // Disable the roomSelect when no floor is selected or floor_id is 1 or 9
-                roomSelect.disabled = true;
-            }
+    if (selectedFloors.length > 0) {
+        selectedFloors.forEach(floorId => {
+            var floorDiv = document.createElement('div');
+            floorDiv.className = 'form-group';
+
+            var label = document.createElement('label');
+            label.textContent = 'Select Rooms for Floor ' + floorId;
+
+            floorDiv.appendChild(label);
+
+            // Fetch rooms for the selected floor
+            fetch('get_rooms.php?floor_id=' + floorId)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(room => {
+                        var roomCheckboxDiv = document.createElement('div');
+                        roomCheckboxDiv.className = 'form-check';
+
+                        var checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.name = 'room_id[' + floorId + '][]'; // Modified to allow multiple room selections per floor
+                        checkbox.value = room.room_id;
+                        checkbox.id = 'room_' + room.room_id; // Unique ID for each checkbox
+
+                        var labelCheckbox = document.createElement('label');
+                        labelCheckbox.htmlFor = 'room_' + room.room_id; // Link the label to the checkbox
+                        labelCheckbox.textContent = room.room_name; // Room name as label text
+                        labelCheckbox.className = 'form-check-label'; // Class for styling
+
+                        roomCheckboxDiv.appendChild(checkbox);
+                        roomCheckboxDiv.appendChild(labelCheckbox);
+                        floorDiv.appendChild(roomCheckboxDiv);
+                    });
+                })
+                .catch(error => console.error('Error fetching rooms:', error));
+
+            roomSelections.appendChild(floorDiv);
         });
-    });
+    }
+}
 </script>
 
 

@@ -69,7 +69,6 @@ $sql = "SELECT
     t.floor_id,
     t.room_id,
     t.status_id,
-    t.toilet_gender_id,
     t.toilet_status_id,
     t.image,
     u.fullname AS user_fullname,
@@ -100,7 +99,6 @@ ORDER BY t.start_date ASC";
             echo '<th>Floor</th>';
             echo '<th>Room</th>';
             echo '<th>Status</th>';
-            echo '<th>Toilet Gender</th>';
             echo '<th>Toilet Status</th>';
             echo '<th>Action</th>';
             echo '</tr>';
@@ -122,21 +120,6 @@ ORDER BY t.start_date ASC";
                         break;
                     default:
                         $status = '-';
-                }
-
-                $toilet_gender = '';
-                switch ($row['toilet_gender_id']) {
-                    case 1:
-                        $toilet_gender = 'Male';
-                        break;
-                    case 2:
-                        $toilet_gender = 'Female';
-                        break;
-                    case 3:
-                        $toilet_gender = 'Both';
-                        break;
-                    default:
-                        $toilet_gender = '-';
                 }
 
                 $toilet_status = '';
@@ -161,7 +144,6 @@ ORDER BY t.start_date ASC";
                 echo '<td>IF-' . ($row["floor_id"] ?? '-') . '</td>';
                 echo '<td>' . ($row["room_name"] ?? '-') . '</td>';
                 echo '<td>' . $status . '</td>';
-                echo '<td>' . $toilet_gender . '</td>';
                 echo '<td>' . $toilet_status . '</td>';
                 echo '<td>';
                 if (!empty($row["image"])) {

@@ -9,7 +9,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 
 // ตรวจสอบการเชื่อมต่อ
 if ($conn->connect_error) {
-    die("การเชื่อมต่อล้มเหลว: " . $conn->connect_error);
+    die("Connection failed: " . $conn->connect_error);
 }
 
 $floor_id = isset($_GET['floor_id']) ? intval($_GET['floor_id']) : 0;

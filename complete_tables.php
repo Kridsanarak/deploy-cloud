@@ -69,7 +69,6 @@ include 'includes/calendar.php';
         t.floor_id,
         t.room_id,
         t.status_id,
-        t.toilet_gender_id,
         t.toilet_status_id,
         t.image,
         u.fullname AS user_fullname,
@@ -88,7 +87,6 @@ include 'includes/calendar.php';
         t.floor_id,
         t.room_id,
         t.status_id,
-        t.toilet_gender_id,
         t.toilet_status_id,
         t.image,
         u.fullname AS user_fullname,
@@ -119,7 +117,6 @@ include 'includes/calendar.php';
             echo '<th>Floor</th>';
             echo '<th>Room</th>';
             echo '<th>Status</th>';
-            echo '<th>Toilet Gender</th>';
             echo '<th>Toilet Status</th>';
             echo '<th>Action</th>';
             echo '</tr>';
@@ -136,16 +133,6 @@ include 'includes/calendar.php';
                     $status = 'Waiting';
                 } else {
                     $status = '-';
-                }
-
-                if ($row['toilet_gender_id'] == 1) {
-                    $toilet_gender = 'Male';
-                } elseif ($row['toilet_gender_id'] == 2) {
-                    $toilet_gender = 'Female';
-                } elseif ($row['toilet_gender_id'] == 3) {
-                    $toilet_gender = 'Both';
-                } else {
-                    $toilet_gender = '-';
                 }
 
                 if ($row['toilet_status_id'] == 1) {
@@ -170,7 +157,6 @@ include 'includes/calendar.php';
                     echo '<td>' . ($row["room_name"] ?? '-') . '</td>';
                 }
                 echo '<td>' . $status . '</td>';
-                echo '<td>' . $toilet_gender . '</td>';
                 echo '<td>' . $toilet_status . '</td>';
                 echo '<td>';
                 if (!empty($row["image"])) {

@@ -101,6 +101,7 @@ if (isset($_POST['add_task_btn'])) {
     $password = "";
     $dbname = "project_maidmanage";
 
+    // สร้างการเชื่อมต่อฐานข้อมูล
     $connection = new mysqli($servername, $username, $password, $dbname);
 
     if ($connection->connect_error) {
@@ -108,45 +109,71 @@ if (isset($_POST['add_task_btn'])) {
     }
 
     $user_id = $_POST['user_id'];
-    $start_date = $_POST['start_date'];
-    $end_date = $_POST['end_date'];
-    $floor_id = $_POST['floor_id'];
-    $room_id = !empty($_POST['room_id']) ? $_POST['room_id'] : null;
+    $task_date = $_POST['task_date']; // ใช้วันที่เดียวสำหรับ start และ end
+    $floor_ids = $_POST['floor_id'];
+    $room_ids = isset($_POST['room_id']) ? $_POST['room_id'] : []; // ตรวจสอบว่ามีการส่ง room_id มาหรือไม่
     $status_id = !empty($_POST['status_id']) ? $_POST['status_id'] : null;
-    $toilet_gender_id = !empty($_POST['toilet_gender_id']) ? $_POST['toilet_gender_id'] : null;
     $toilet_status_id = !empty($_POST['toilet_status_id']) ? $_POST['toilet_status_id'] : null;
 
-    // แปลงวันที่เริ่มต้นและวันที่สิ้นสุดเป็นออบเจ็กต์ DateTime
-    $start = new DateTime($start_date);
-    $end = new DateTime($end_date);
-    $end = $end->modify('+1 day'); // รวมวันที่สิ้นสุดในช่วงเวลา
+    foreach ($floor_ids as $floor_id) {
+        if (isset($room_ids[$floor_id]) && !empty($room_ids[$floor_id])) {
+            // กรณีที่เลือกห้องในแต่ละชั้น
+            foreach ($room_ids[$floor_id] as $room_id) {
+                if (!empty($room_id)) {
+                    // ตรวจสอบว่าห้องที่เลือกมีอยู่ในฐานข้อมูลหรือไม่
+                    $roomCheckQuery = "SELECT room_id FROM room WHERE room_id = ?";
+                    $stmt = $connection->prepare($roomCheckQuery);
+                    $stmt->bind_param('i', $room_id);
+                    $stmt->execute();
+                    $roomCheckResult = $stmt->get_result();
 
-    // สร้าง DatePeriod โดยมีช่วงเวลาหนึ่งวัน
-    $interval = new DateInterval('P1D');
-    $period = new DatePeriod($start, $interval, $end);
+                    if ($roomCheckResult->num_rows > 0) {
+                        // บันทึกข้อมูล task พร้อม room_id ที่ถูกต้อง
+                        $query = "INSERT INTO task (user_id, start_date, end_date, floor_id, room_id, status_id, toilet_status_id) 
+                                  VALUES (?, ?, ?, ?, ?, ?, ?)";
+                        $stmt = $connection->prepare($query);
+                        $stmt->bind_param('issiiii', $user_id, $task_date, $task_date, $floor_id, $room_id, $status_id, $toilet_status_id);
 
-    foreach ($period as $date) {
-        $current_date = $date->format('Y-m-d');
-
-        // เพิ่มงานสำหรับแต่ละวันที่ในช่วงเวลา
-        $query = "INSERT INTO task (user_id, start_date, end_date, floor_id, room_id, status_id, toilet_gender_id, toilet_status_id) 
-                  VALUES ('$user_id', '$current_date', '$current_date', '$floor_id', " . ($room_id !== null ? "'$room_id'" : "NULL") . ", " . ($status_id !== null ? "'$status_id'" : "NULL") . ", " . ($toilet_gender_id !== null ? "'$toilet_gender_id'" : "NULL") . ", " . ($toilet_status_id !== null ? "'$toilet_status_id'" : "NULL") . ")";
-
-        if (mysqli_query($connection, $query)) {
-            $_SESSION['status'] = "Task added successfully!";
-            $_SESSION['status_code'] = "success";
+                        if ($stmt->execute()) {
+                            $_SESSION['status'] = "Task added successfully!";
+                            $_SESSION['status_code'] = "success";
+                        } else {
+                            $_SESSION['status'] = "Failed to add task: " . $stmt->error;
+                            $_SESSION['status_code'] = "error";
+                        }
+                    } else {
+                        $_SESSION['status'] = "Room ID $room_id does not exist.";
+                        $_SESSION['status_code'] = "error";
+                    }
+                }
+            }
         } else {
-            $_SESSION['status'] = "Failed to add task: " . mysqli_error($connection);
-            $_SESSION['status_code'] = "error";
+            // กรณีที่ไม่ได้เลือกห้อง ให้ใช้ room_id เป็น NULL
+            $query = "INSERT INTO task (user_id, start_date, end_date, floor_id, room_id, status_id, toilet_status_id) 
+                      VALUES (?, ?, ?, ?, NULL, ?, ?)";
+            $stmt = $connection->prepare($query);
+            $stmt->bind_param('issiii', $user_id, $task_date, $task_date, $floor_id, $status_id, $toilet_status_id);
+
+            if ($stmt->execute()) {
+                $_SESSION['status'] = "Task added successfully without room!";
+                $_SESSION['status_code'] = "success";
+            } else {
+                $_SESSION['status'] = "Failed to add task without room: " . $stmt->error;
+                $_SESSION['status_code'] = "error";
+            }
         }
     }
 
-    // ปิดการเชื่อมต่อ
+    // ปิดการเชื่อมต่อฐานข้อมูล
     $connection->close();
 
-    // เปลี่ยนเส้นทางกลับไปที่หน้าแรก
+    // Redirect ไปหน้า main.php
     header('Location: main.php');
+    exit();
 }
+
+
+
 
 if (isset($_POST['send_task_btn'])) {
     // Connect to the database

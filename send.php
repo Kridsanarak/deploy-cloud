@@ -57,7 +57,6 @@ $sql = "SELECT
     t.floor_id,
     t.room_id,
     t.status_id,
-    t.toilet_gender_id,
     t.toilet_status_id,
     t.image,
     u.fullname AS user_fullname,
@@ -82,11 +81,9 @@ ORDER BY t.start_date ASC";
             echo '<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">';
             echo '<thead>';
             echo '<tr>';
-            echo '<th>User</th>';
             echo '<th>Floor</th>';
             echo '<th>Room</th>';
             echo '<th>Status</th>';
-            echo '<th>Toilet Gender</th>';
             echo '<th>Toilet Status</th>';
             echo '<th>Action</th>';
             echo '</tr>';
@@ -110,21 +107,6 @@ ORDER BY t.start_date ASC";
                         $status = '-';
                 }
 
-                $toilet_gender = '';
-                switch ($row['toilet_gender_id']) {
-                    case 1:
-                        $toilet_gender = 'Male';
-                        break;
-                    case 2:
-                        $toilet_gender = 'Female';
-                        break;
-                    case 3:
-                        $toilet_gender = 'Both';
-                        break;
-                    default:
-                        $toilet_gender = '-';
-                }
-
                 $toilet_status = '';
                 switch ($row['toilet_status_id']) {
                     case 1:
@@ -141,11 +123,9 @@ ORDER BY t.start_date ASC";
                 }
         
                 echo '<tr>';
-                echo '<td>' . ($row["user_fullname"] ?? '-') . '</td>';
                 echo '<td>IF-' . ($row["floor_id"] ?? '-') . '</td>';
                 echo '<td>' . ($row["room_name"] ?? '-') . '</td>';
                 echo '<td>' . $status . '</td>';
-                echo '<td>' . $toilet_gender . '</td>';
                 echo '<td>' . $toilet_status . '</td>';
                 echo '<td>';
                 if (($status == 'Ready' || is_null($status)) && ($toilet_status == 'Ready' || is_null($toilet_status))) {
@@ -159,7 +139,7 @@ ORDER BY t.start_date ASC";
                         echo '<button type="button" class="btn btn-success btn-circle btn-sm" data-toggle="modal" data-target="#sendTaskModal' . $row["task_id"] . '"><i class="fas fa-paper-plane"></i></button>';
                     }
                     echo '  ';
-                    echo '<button type="button" class="btn btn-info btn-circle btn-sm" data-toggle="modal" data-target="#imageModal' . $row["task_id"] . '"><i class="fas fa-image"></i></button>';
+                    
                     echo '</td>';
                     echo '</tr>';
         
@@ -255,18 +235,6 @@ ORDER BY t.start_date ASC";
         ?>
     </div>
 
-</div>
-<!-- /.container-fluid -->
-
-</div>
-<!-- End of Main Content -->
-
-</div>
-<!-- End of Content Wrapper -->
-
-</div>
-<!-- End of Page Wrapper -->
-
 <!-- Scroll to Top Button-->
 <a class="scroll-to-top rounded" href="#page-top">
     <i class="fas fa-angle-up"></i>
@@ -288,4 +256,5 @@ ORDER BY t.start_date ASC";
 
 <?php
 include 'includes/footer.php';
+include 'includes/scripts.php';
 ?>

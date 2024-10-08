@@ -123,7 +123,6 @@ if ($result_floor_user && $result_floor_user->num_rows > 0) {
                 t.floor_id,   
                 t.room_id,    
                 t.status_id,
-                t.toilet_gender_id,
                 t.toilet_status_id,
                 t.image,
                 t.user_id
@@ -226,7 +225,6 @@ if ($result_floor_user && $result_floor_user->num_rows > 0) {
             t.floor_id,
             t.room_id,
             t.status_id,
-            t.toilet_gender_id,
             t.toilet_status_id,
             t.image,
             r.room_name,
@@ -291,24 +289,6 @@ if ($result_floor_user && $result_floor_user->num_rows > 0) {
 
                                 // แสดงประเภทห้อง
                                 echo 'ประเภท: ' . ($row["room_type_name"] ?? '-') . '<br>';
-
-                                // แสดงห้องน้ำ
-                                echo 'ห้องน้ำ: ';
-                                switch ($row["toilet_gender_id"]) {
-                                    case 1:
-                                        echo 'Male';
-                                        break;
-                                    case 2:
-                                        echo 'Female';
-                                        break;
-                                    case 3:
-                                        echo 'Both';
-                                        break;
-                                    default:
-                                        echo '-';
-                                        break;
-                                }
-                                echo '<br>';
 
                                 // แสดงสถานะห้องน้ำ
                                 echo 'สถานะห้องน้ำ: ';

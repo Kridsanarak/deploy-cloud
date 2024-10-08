@@ -34,7 +34,6 @@ include 'includes/calendar.php';
 
 <!-- Begin Page Content -->
 <div class="container-fluid">
-
     <!-- DataTales Example -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
@@ -68,7 +67,6 @@ $sql = "SELECT
     t.floor_id,
     t.room_id,
     t.status_id,
-    t.toilet_gender_id,
     t.toilet_status_id,
     t.image,
     u.fullname AS user_fullname,
@@ -97,7 +95,6 @@ if ($result->num_rows > 0) {
     echo '<th>Floor</th>';
     echo '<th>Room</th>';
     echo '<th>Status</th>';
-    echo '<th>Toilet Gender</th>';
     echo '<th>Toilet Status</th>';
     echo '<th>Action</th>';
     echo '</tr>';
@@ -114,16 +111,6 @@ if ($result->num_rows > 0) {
             $status = 'Waiting';
         } else {
             $status = '-';
-        }
-
-        if ($row['toilet_gender_id'] == 1) {
-            $toilet_gender = 'Male';
-        } elseif ($row['toilet_gender_id'] == 2) {
-            $toilet_gender = 'Female';
-        } elseif ($row['toilet_gender_id'] == 3) {
-            $toilet_gender = 'Both';
-        } else {
-            $toilet_gender = '-';
         }
 
         if ($row['toilet_status_id'] == 1) {
@@ -148,7 +135,6 @@ if ($result->num_rows > 0) {
             echo '<td>' . ($row["room_name"] ?? '-') . '</td>';
         }
         echo '<td>' . $status . '</td>';
-        echo '<td>' . $toilet_gender . '</td>';
         echo '<td>' . $toilet_status . '</td>';
         echo '<td>';
         if (!empty($row["image"])) {
@@ -195,22 +181,21 @@ if ($result->num_rows > 0) {
     echo "</div>";
 }
 
+
 // ปิดการเชื่อมต่อกับฐานข้อมูล
 $conn->close();
 ?>
 
+
+
     </div>
-</div>
-<!-- /.container-fluid -->
+        <!-- Form สำหรับสร้าง PDF -->
+        <form action="generate_pdf.php" method="post">
+        <button type="submit" class="btn btn-primary mb-3">Generate PDF</button>
+    </form>
 
+    
 </div>
-<!-- End of Main Content -->
-
-</div>
-<!-- End of Content Wrapper -->
-
-</div>
-<!-- End of Page Wrapper -->
 
 <!-- Scroll to Top Button-->
 <a class="scroll-to-top rounded" href="#page-top">

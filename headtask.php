@@ -144,16 +144,6 @@ include 'includes/calendar.php';
                     </select>
                 </div>
 
-                <!-- Toilet Gender -->
-                <div class="form-group">
-                    <label> Toilet Gender </label>
-                    <select name="toilet_gender" class="form-control" required>
-                        <option value="">--- Please select ---</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Both">Both</option>
-                    </select>
-                </div>
 
                 <!-- Toilet Status -->
                 <div class="form-group">

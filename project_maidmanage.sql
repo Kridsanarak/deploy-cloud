@@ -179,7 +179,6 @@ CREATE TABLE `task` (
   `floor_id` int(255) NOT NULL,
   `room_id` int(255) DEFAULT NULL,
   `status_id` int(255) DEFAULT NULL,
-  `toilet_gender_id` int(255) DEFAULT NULL,
   `toilet_status_id` int(255) DEFAULT NULL,
   `image` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -188,28 +187,8 @@ CREATE TABLE `task` (
 -- Dumping data for table `task`
 --
 
-INSERT INTO `task` (`task_id`, `start_date`, `end_date`, `user_id`, `floor_id`, `room_id`, `status_id`, `toilet_gender_id`, `toilet_status_id`, `image`) VALUES
+INSERT INTO `task` (`task_id`, `start_date`, `end_date`, `user_id`, `floor_id`, `room_id`, `status_id`, `toilet_status_id`, `image`) VALUES
 (1, '2024-07-19', '2024-07-19', 3, 1, NULL, NULL, 3, 3, 'image.jpg');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `toilet_gender`
---
-
-CREATE TABLE `toilet_gender` (
-  `toilet_gender_id` int(3) NOT NULL,
-  `toilet_gender_name` enum('Male','Female','Both') NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `toilet_gender`
---
-
-INSERT INTO `toilet_gender` (`toilet_gender_id`, `toilet_gender_name`) VALUES
-(1, 'Male'),
-(2, 'Female'),
-(3, 'Both');
 
 -- --------------------------------------------------------
 
@@ -301,14 +280,7 @@ ALTER TABLE `task`
   ADD KEY `floor_id` (`floor_id`),
   ADD KEY `room_id` (`room_id`),
   ADD KEY `status_id` (`status_id`),
-  ADD KEY `toilet_gender_id` (`toilet_gender_id`),
   ADD KEY `toilet_status_id` (`toilet_status_id`);
-
---
--- Indexes for table `toilet_gender`
---
-ALTER TABLE `toilet_gender`
-  ADD PRIMARY KEY (`toilet_gender_id`);
 
 --
 -- Indexes for table `toilet_status`
@@ -365,10 +337,7 @@ ALTER TABLE `task`
   MODIFY `task_id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT for table `toilet_gender`
---
-ALTER TABLE `toilet_gender`
-  MODIFY `toilet_gender_id` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
 
 --
 -- AUTO_INCREMENT for table `toilet_status`
@@ -401,7 +370,6 @@ ALTER TABLE `task`
   ADD CONSTRAINT `task_ibfk_2` FOREIGN KEY (`floor_id`) REFERENCES `floor` (`floor_id`),
   ADD CONSTRAINT `task_ibfk_3` FOREIGN KEY (`room_id`) REFERENCES `room` (`room_id`),
   ADD CONSTRAINT `task_ibfk_4` FOREIGN KEY (`status_id`) REFERENCES `status` (`status_id`),
-  ADD CONSTRAINT `task_ibfk_5` FOREIGN KEY (`toilet_gender_id`) REFERENCES `toilet_gender` (`toilet_gender_id`),
   ADD CONSTRAINT `task_ibfk_6` FOREIGN KEY (`toilet_status_id`) REFERENCES `toilet_status` (`toilet_status_id`);
 
 --
