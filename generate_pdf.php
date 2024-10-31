@@ -3,9 +3,9 @@
 require_once('tcpdf/tcpdf.php');
 
 // ตั้งค่าการเชื่อมต่อฐานข้อมูล
-$servername = "localhost";
-$username = "root";
-$password = "";
+$servername = "db"; // Use the service name 'db' defined in docker-compose
+$username = "user"; // User defined in docker-compose
+$password = "user_password"; // Password defined in docker-compose
 $dbname = "project_maidmanage";
 
 $conn = new mysqli($servername, $username, $password, $dbname);

@@ -1,9 +1,9 @@
 <?php
 
-$server_name = "localhost";
-$db_username = "root";
-$db_password = "";
-$db_name = "project";
+$servername = "db"; // Use the service name 'db' defined in docker-compose
+$username = "user"; // User defined in docker-compose
+$password = "user_password"; // Password defined in docker-compose
+$dbname = "project_maidmanage";
 
 $connection = mysqli_connect($server_name, $db_username, $db_password, $db_name);
 

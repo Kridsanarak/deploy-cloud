@@ -5,9 +5,9 @@ session_start();
 // Handle user registration
 if (isset($_POST['registerbtn'])) {
     // เชื่อมต่อฐานข้อมูล
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
+    $servername = "db"; // Use the service name 'db' defined in docker-compose
+    $username = "user"; // User defined in docker-compose
+    $password = "user_password"; // Password defined in docker-compose
     $dbname = "project_maidmanage";
 
     $connection = new mysqli($servername, $username, $password, $dbname);
@@ -53,9 +53,9 @@ if (isset($_POST['registerbtn'])) {
 
 // Handle user deletion
 if (isset($_POST['deleteUserId'])) {
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
+    $servername = "db"; // Use the service name 'db' defined in docker-compose
+    $username = "user"; // User defined in docker-compose
+    $password = "user_password"; // Password defined in docker-compose
     $dbname = "project_maidmanage";
 
     $connection = new mysqli($servername, $username, $password, $dbname);
@@ -96,9 +96,9 @@ if (isset($_POST['deleteUserId'])) {
 
 
 if (isset($_POST['add_task_btn'])) {
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
+    $servername = "db"; // Use the service name 'db' defined in docker-compose
+    $username = "user"; // User defined in docker-compose
+    $password = "user_password"; // Password defined in docker-compose
     $dbname = "project_maidmanage";
 
     // สร้างการเชื่อมต่อฐานข้อมูล
@@ -177,9 +177,9 @@ if (isset($_POST['add_task_btn'])) {
 
 if (isset($_POST['send_task_btn'])) {
     // Connect to the database
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
+    $servername = "db"; // Use the service name 'db' defined in docker-compose
+    $username = "user"; // User defined in docker-compose
+    $password = "user_password"; // Password defined in docker-compose
     $dbname = "project_maidmanage";
 
     $connection = new mysqli($servername, $username, $password, $dbname);

@@ -106,9 +106,9 @@ include 'includes/calendar.php';
         </div>
         <?php
         // การกำหนดค่าในการเชื่อมต่อฐานข้อมูล
-        $servername = "localhost";
-        $username = "root";
-        $password = "";
+        $servername = "db"; // Use the service name 'db' defined in docker-compose
+        $username = "user"; // User defined in docker-compose
+        $password = "user_password"; // Password defined in docker-compose
         $dbname = "project_maidmanage";
 
         // การเชื่อมต่อกับ MySQL

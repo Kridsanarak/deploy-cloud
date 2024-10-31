@@ -2,10 +2,11 @@
 session_start();
 
 if (isset($_POST['edit_user_btn'])) {
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
+    $servername = "db"; // Use the service name 'db' defined in docker-compose
+    $username = "user"; // User defined in docker-compose
+    $password = "user_password"; // Password defined in docker-compose
     $dbname = "project_maidmanage";
+
 
     // สร้างการเชื่อมต่อกับฐานข้อมูล
     $connection = new mysqli($servername, $username, $password, $dbname);

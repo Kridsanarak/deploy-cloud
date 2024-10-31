@@ -188,7 +188,7 @@ CREATE TABLE `task` (
 --
 
 INSERT INTO `task` (`task_id`, `start_date`, `end_date`, `user_id`, `floor_id`, `room_id`, `status_id`, `toilet_status_id`, `image`) VALUES
-(1, '2024-07-19', '2024-07-19', 3, 1, NULL, NULL, 3, 3, 'image.jpg');
+(1, '2024-07-19', '2024-07-19', 3, 1, NULL, NULL, 3, 'image.jpg');
 
 -- --------------------------------------------------------
 

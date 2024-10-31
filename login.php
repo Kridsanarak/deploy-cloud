@@ -1,11 +1,12 @@
 <?php
 session_start();
-// เชื่อมต่อกับ MySQL
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "project_maidmanage";
+// Database connection parameters
+$servername = "db"; // Use the service name 'db' defined in docker-compose
+$username = "user"; // User defined in docker-compose
+$password = "user_password"; // Password defined in docker-compose
+$dbname = "project_maidmanage"; // Correct database name
 
+// Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 // ตรวจสอบการเชื่อมต่อ
