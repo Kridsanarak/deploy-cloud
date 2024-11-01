@@ -1,6 +1,6 @@
 <?php
 // รวมไลบรารี TCPDF
-require_once('/var/www/html/realproject/TCPDF/tcpdf.php');
+require_once('/var/www/html/realproject/TCPDF-main/tcpdf.php');
 
 // ตั้งค่าการเชื่อมต่อฐานข้อมูล
 $servername = "db"; // Use the service name 'db' defined in docker-compose

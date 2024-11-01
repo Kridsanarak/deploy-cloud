@@ -22,7 +22,7 @@ $current_user_id = $_SESSION['user_id'];
 ?>
 
 <!-- Begin Page Content -->
-<div class="container-fluid">
+<div class="container-fluid " style="margin-top: 1.5rem;">
 
     <!-- DataTales Example -->
     <div class="card shadow mb-4">

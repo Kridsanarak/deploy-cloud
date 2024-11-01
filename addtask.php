@@ -50,19 +50,20 @@ include 'includes/calendar.php';
                             $dbname = "project_maidmanage";
                         
                             $connection = new mysqli($servername, $username, $password, $dbname);
-                        if ($conn->connect_error) {
-                            die("Connection failed: " . $conn->connect_error);
-                        }
-                        $sql = "SELECT * FROM users WHERE role_id != '1' AND status_id = '1'";
-                        $result = mysqli_query($conn, $sql);
-                        if (mysqli_num_rows($result) > 0) {
-                            while ($row = mysqli_fetch_assoc($result)) {
-                                echo '<option value="' . $row['user_id'] . '">' . $row['fullname'] . '</option>';
+                            if ($connection->connect_error) {
+                                die("Connection failed: " . $connection->connect_error);
                             }
-                        } else {
-                            echo '<option value="">No users available</option>';
-                        }
-                        $conn->close();
+                            
+                            $sql = "SELECT * FROM users WHERE role_id != '1' AND status_id = '1'";
+                            $result = mysqli_query($connection, $sql);
+                            if (mysqli_num_rows($result) > 0) {
+                                while ($row = mysqli_fetch_assoc($result)) {
+                                    echo '<option value="' . $row['user_id'] . '">' . $row['fullname'] . '</option>';
+                                }
+                            } else {
+                                echo '<option value="">No users available</option>';
+                            }
+                            $connection->close();
                         ?>
                     </select>
                 </div>
@@ -142,29 +143,31 @@ function fetchRooms() {
 
             // Fetch rooms for the selected floor
             fetch('get_rooms.php?floor_id=' + floorId)
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(room => {
-                        var roomCheckboxDiv = document.createElement('div');
-                        roomCheckboxDiv.className = 'form-check';
+    .then(response => response.json())
+    .then(data => {
+        data.forEach(room => {
+            var roomCheckboxDiv = document.createElement('div');
+            roomCheckboxDiv.className = 'form-check'; // Bootstrap class for checkbox styling
 
-                        var checkbox = document.createElement('input');
-                        checkbox.type = 'checkbox';
-                        checkbox.name = 'room_id[' + floorId + '][]'; // Modified to allow multiple room selections per floor
-                        checkbox.value = room.room_id;
-                        checkbox.id = 'room_' + room.room_id; // Unique ID for each checkbox
+            var checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.name = 'room_id[' + floorId + '][]'; // Modified to allow multiple room selections per floor
+            checkbox.value = room.room_id;
+            checkbox.id = 'room_' + room.room_id; // Unique ID for each checkbox
+            checkbox.className = 'form-check-input'; // Bootstrap class for checkbox
 
-                        var labelCheckbox = document.createElement('label');
-                        labelCheckbox.htmlFor = 'room_' + room.room_id; // Link the label to the checkbox
-                        labelCheckbox.textContent = room.room_name; // Room name as label text
-                        labelCheckbox.className = 'form-check-label'; // Class for styling
+            var labelCheckbox = document.createElement('label');
+            labelCheckbox.htmlFor = 'room_' + room.room_id; // Link the label to the checkbox
+            labelCheckbox.textContent = room.room_name; // Room name as label text
+            labelCheckbox.className = 'form-check-label'; // Bootstrap class for label styling
 
-                        roomCheckboxDiv.appendChild(checkbox);
-                        roomCheckboxDiv.appendChild(labelCheckbox);
-                        floorDiv.appendChild(roomCheckboxDiv);
-                    });
-                })
-                .catch(error => console.error('Error fetching rooms:', error));
+            roomCheckboxDiv.appendChild(checkbox);
+            roomCheckboxDiv.appendChild(labelCheckbox);
+            floorDiv.appendChild(roomCheckboxDiv);
+        });
+    })
+    .catch(error => console.error('Error fetching rooms:', error));
+
 
             roomSelections.appendChild(floorDiv);
         });
