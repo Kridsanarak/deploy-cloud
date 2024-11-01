@@ -133,7 +133,7 @@ include 'includes/calendar.php';
             echo '<th>Name</th>';
             echo '<th>Username</th>';
             echo '<th>Role</th>';
-            echo '<th>Timestamp</th>';
+            echo '<th>Lastlogin</th>';
             echo '<th>Status</th>';
             echo '<th>Action</th>';
             echo '</tr>';
@@ -163,10 +163,16 @@ include 'includes/calendar.php';
                 echo '<td>' . htmlspecialchars($row["username"], ENT_QUOTES, 'UTF-8') . '</td>';
                 echo '<td>' . $role . '</td>';
                 if (empty($row["timestamp"])) {
-                    echo '<td>New User</td>'; // Display "New User" if timestamp is empty or null
+                    echo '<td>New User</td>'; // แสดง "New User" ถ้า timestamp ว่างหรือเป็น null
                 } else {
-                    echo '<td>' . htmlspecialchars($row["timestamp"], ENT_QUOTES, 'UTF-8') . '</td>';
-                }
+                    $date = DateTime::createFromFormat('Y-m-d H:i:s', $row["timestamp"]);
+                    // ตรวจสอบว่าข้อมูลมีรูปแบบที่ถูกต้องและตรงกับ input เดิมหรือไม่
+                    if ($date !== false && $date->format('Y-m-d H:i:s') === $row["timestamp"]) {
+                        echo '<td>' . htmlspecialchars($row["timestamp"], ENT_QUOTES, 'UTF-8') . '</td>';
+                    } else {
+                        echo '<td></td>'; // ถ้าไม่ใช่รูปแบบ 'Y-m-d H:i:s' จะไม่แสดงอะไร
+                    }
+                }                
                 echo '<td>' . $status . '</td>';
                 echo '<td>
                     <button class="btn btn-primary btn-circle btn-sm mr-1" data-toggle="modal" data-target="#editadminprofile' . $row["user_id"] . '"><i class="fas fa-edit"></i></button>

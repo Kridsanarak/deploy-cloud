@@ -44,7 +44,12 @@ include 'includes/calendar.php';
                     <select name="user_id" class="form-control" required>
                         <option value="">--- Please select ---</option>
                         <?php
-                        $conn = new mysqli("localhost", "root", "", "project_maidmanage");
+                            $servername = "db"; // Use the service name 'db' defined in docker-compose
+                            $username = "user"; // User defined in docker-compose
+                            $password = "user_password"; // Password defined in docker-compose
+                            $dbname = "project_maidmanage";
+                        
+                            $connection = new mysqli($servername, $username, $password, $dbname);
                         if ($conn->connect_error) {
                             die("Connection failed: " . $conn->connect_error);
                         }
