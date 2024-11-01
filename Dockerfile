@@ -20,13 +20,15 @@ COPY phpmyadmin.conf /etc/apache2/sites-available/phpmyadmin.conf
 # เปิดใช้งาน Virtual Host และ Apache module alias
 RUN a2enmod alias \
     && a2ensite phpmyadmin.conf
+    
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
 # ตรวจสอบว่ามีไฟล์กำหนดค่าใน /etc/apache2/conf-available/ แล้วเปิดใช้งานถ้ามี
 # COPY my-httpd.conf /etc/apache2/conf-available/my-httpd.conf  # Uncomment ถ้าคุณมีไฟล์นี้
 # RUN a2enconf my-httpd # Uncomment ถ้าคุณคัดลอกไฟล์นี้ไปใน container
 
 # Copy ไฟล์ทั้งหมดไปยัง container
-COPY . /var/www/html/
+COPY . /var/www/html/realproject
 
 # ตั้งค่าการให้สิทธิ์ไฟล์ (ถ้าจำเป็น)
 RUN chown -R www-data:www-data /var/www/html

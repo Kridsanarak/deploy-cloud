@@ -13,13 +13,15 @@ services:
 
   db:
     image: mysql:5.7
+    container_name: db
     environment:
       MYSQL_ROOT_PASSWORD: root_password
       MYSQL_DATABASE: project_maidmanage
       MYSQL_USER: user
       MYSQL_PASSWORD: user_password
+
     volumes:
-      - ./project_maidmanage.sql:/docker-entrypoint-initdb.d/project_maidmanage.sql
+      - /var/www/html/realproject/project_maidmanage.sql:/docker-entrypoint-initdb.d/project_maidmanage.sql
     ports:
       - "3306:3306"
     networks:
@@ -27,14 +29,15 @@ services:
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
     environment:
-      PMA_HOST: project_maidmanage
+      PMA_HOST: db
       PMA_USER: user
       PMA_PASSWORD: user_password
-      PMA_PORT: 3306
     volumes:
-      - ./my-httpd.conf:/var/www/html/realproject/my-httpd.conf
-    command: ["apache2-foreground", "-c", "Include conf-available/my-httpd.conf"]
+      - ./phpmyadmin.conf:/var/www/html/realproject/phpmyadmin.conf
+    networks:
+      - app-network
 
 networks:
   app-network:
