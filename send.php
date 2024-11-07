@@ -23,12 +23,21 @@ $current_user_id = $_SESSION['user_id'];
 
 <!-- Begin Page Content -->
 <div class="container-fluid " style="margin-top: 1.5rem;">
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <!-- DataTales Example -->
     <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Task</h6>
-        </div>
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">
+                Task :
+                <span class="mr-2 d-none d-lg-inline text-black-600 bold">
+                    <?php echo $_SESSION['full_name']; ?>
+                </span>
+            </h6>
+        <a href="main.php" class="btn btn-primary">
+            <i class="bi bi-house"></i> <!-- ใช้ Bootstrap Icon ที่ชื่อ "house-door" -->
+        </a>
+    </div>
+
         <?php
         date_default_timezone_set('Asia/Bangkok');
         // การกำหนดค่าในการเชื่อมต่อฐานข้อมูล
@@ -81,7 +90,7 @@ ORDER BY t.start_date ASC";
             echo '<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">';
             echo '<thead>';
             echo '<tr>';
-            echo '<th>Floor</th>';
+            
             echo '<th>Room</th>';
             echo '<th>Status</th>';
             echo '<th>Toilet Status</th>';
@@ -123,7 +132,7 @@ ORDER BY t.start_date ASC";
                 }
         
                 echo '<tr>';
-                echo '<td>IF-' . ($row["floor_id"] ?? '-') . '</td>';
+                
                 echo '<td>' . ($row["room_name"] ?? '-') . '</td>';
                 echo '<td>' . $status . '</td>';
                 echo '<td>' . $toilet_status . '</td>';
