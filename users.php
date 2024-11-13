@@ -1,8 +1,9 @@
 <?php
 session_start();
 include 'includes/header.php';
+include 'includes/calendar.php';
 
-// ตรวจสอบบทบาทของผู้ใช้
+// เช็ค Role
 if (!isset($_SESSION['role_id'])) {
     echo "
     <script type='text/javascript'>
@@ -15,10 +16,10 @@ if (!isset($_SESSION['role_id'])) {
     exit;
 }
 
-// กำหนดค่าตัวแปร $role_id จาก Session
+// เก็บค่า Role 
 $role_id = $_SESSION['role_id'];
 
-// เลือก Navbar ตามบทบาทของผู้ใช้
+// เลือก Navbar ตาม Role
 if ($role_id == '1') {
     include 'includes/navbar.php';
 } elseif ($role_id == '2') {
@@ -29,14 +30,13 @@ if ($role_id == '1') {
     echo "ไม่สามารถระบุบทบาทของผู้ใช้ได้";
     exit;
 }
-include 'includes/calendar.php';
 ?>
 
 <div class="container-fluid">
-    <!-- Page Heading -->
     <h1 class="h3 mb-2 text-gray-800">Users</h1>
-    <!-- DataTales Example -->
     <div class="card shadow mb-4">
+
+        <!-- Add User -->
         <div class="card-header py-3">
             <div class="modal fade" id="addadminprofile" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
@@ -102,8 +102,10 @@ include 'includes/calendar.php';
                 Add Users
             </button>
 
-
         </div>
+        <!-- End Add User -->
+
+        <!-- เชื่อม Database -->
         <?php
         // การกำหนดค่าในการเชื่อมต่อฐานข้อมูล
         $servername = "db"; // Use the service name 'db' defined in docker-compose
@@ -118,13 +120,11 @@ include 'includes/calendar.php';
         if ($conn->connect_error) {
             die("การเชื่อมต่อล้มเหลว: " . $conn->connect_error);
         }
-
-        // สร้างคำสั่ง SQL เพื่อดึงข้อมูล
         $sql = "SELECT * FROM users";
         $result = $conn->query($sql);
 
+        // แสดงตาราง User
         if ($result->num_rows > 0) {
-            // แสดงข้อมูลในรูปแบบของตาราง HTML
             echo '<div class="card-body">';
             echo '<div class="table-responsive">';
             echo '<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">';
@@ -133,14 +133,13 @@ include 'includes/calendar.php';
             echo '<th>Name</th>';
             echo '<th>Username</th>';
             echo '<th>Role</th>';
-            echo '<th>Lastlogin</th>';
+            echo '<th>Timestamp</th>';
             echo '<th>Status</th>';
             echo '<th>Action</th>';
             echo '</tr>';
             echo '</thead>';
             echo '<tbody>';
             while ($row = $result->fetch_assoc()) {
-                // แปลง role_id เป็นข้อความที่อ่านได้
                 if ($row['role_id'] == 1) {
                     $role = 'Admin';
                 } elseif ($row['role_id'] == 2) {
@@ -149,7 +148,6 @@ include 'includes/calendar.php';
                     $role = 'Maid';
                 }
 
-                // แปลง status_id เป็นข้อความที่อ่านได้
                 if ($row['status_id'] == 1) {
                     $status = 'พร้อม';
                 } elseif ($row['status_id'] == 3) {
@@ -163,17 +161,13 @@ include 'includes/calendar.php';
                 echo '<td>' . htmlspecialchars($row["username"], ENT_QUOTES, 'UTF-8') . '</td>';
                 echo '<td>' . $role . '</td>';
                 if (empty($row["timestamp"])) {
-                    echo '<td>New User</td>'; // แสดง "New User" ถ้า timestamp ว่างหรือเป็น null
+                    echo '<td>New User</td>'; 
                 } else {
-                    $date = DateTime::createFromFormat('Y-m-d H:i:s', $row["timestamp"]);
-                    // ตรวจสอบว่าข้อมูลมีรูปแบบที่ถูกต้องและตรงกับ input เดิมหรือไม่
-                    if ($date !== false && $date->format('Y-m-d H:i:s') === $row["timestamp"]) {
-                        echo '<td>' . htmlspecialchars($row["timestamp"], ENT_QUOTES, 'UTF-8') . '</td>';
-                    } else {
-                        echo '<td></td>'; // ถ้าไม่ใช่รูปแบบ 'Y-m-d H:i:s' จะไม่แสดงอะไร
-                    }
-                }                
+                    echo '<td>' . htmlspecialchars($row["timestamp"], ENT_QUOTES, 'UTF-8') . '</td>';
+                }
                 echo '<td>' . $status . '</td>';
+
+                // ปุ่ม Edit , Delete
                 echo '<td>
                     <button class="btn btn-primary btn-circle btn-sm mr-1" data-toggle="modal" data-target="#editadminprofile' . $row["user_id"] . '"><i class="fas fa-edit"></i></button>
                     <form action="code.php" method="POST" style="display:inline;">
@@ -181,7 +175,8 @@ include 'includes/calendar.php';
                         <button type="submit" class="btn btn-danger btn-circle btn-sm" onclick="return confirm(\'Are you sure you want to delete this user?\')"><i class="fas fa-trash"></i></button>
                     </form>
                 </td>';
-                // เพิ่มโมดัลเชียลแก้ไขผู้ใช้ (edit user modal) ด้วย ID ที่ไม่ซ้ำกันตาม user_id
+
+                // Edit User
                 echo '<div class="modal fade" id="editadminprofile' . $row["user_id"] . '" tabindex="-1" role="dialog" aria-labelledby="editAdminProfileLabel' . $row["user_id"] . '" aria-hidden="true">';
                 echo '<div class="modal-dialog" role="document">';
                 echo '<div class="modal-content">';
@@ -231,6 +226,7 @@ include 'includes/calendar.php';
                 echo '</div>';
                 echo '</div>';
                 echo '</div>';
+                // End Edit User
             }
             echo '</tbody>';
             echo '</table>';
@@ -240,7 +236,6 @@ include 'includes/calendar.php';
             echo "0 ผลลัพธ์";
         }
 
-        // ปิดการเชื่อมต่อกับฐานข้อมูล
         $conn->close();
         ?>
 

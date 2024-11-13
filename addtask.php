@@ -91,20 +91,18 @@ include 'includes/calendar.php';
                     <div class="form-group">
                     <label>Room Status</label>
                     <select name="status_id" class="form-control">
-                        <option value="">--- Please select ---</option>
-                        <option value="1">Ready</option>
-                        <option value="2">Waiting</option>
                         <option value="3">Not Ready</option>
+                        <option value="2">Waiting</option>
+                        <option value="1">Ready</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label>Toilet Status</label>
                     <select name="toilet_status_id" class="form-control">
-                        <option value="">--- Please select ---</option>
-                        <option value="1">Ready</option>
-                        <option value="2">Waiting</option>
                         <option value="3">Not Ready</option>
+                        <option value="2">Waiting</option>
+                        <option value="1">Ready</option>
                     </select>
                 </div>
 
