@@ -88,8 +88,7 @@ include 'includes/calendar.php';
                 echo '<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">';
                 echo '<thead>';
                 echo '<tr>';
-                echo '<th>Start Date</th>';
-                echo '<th>End Date</th>';
+                echo '<th>Date</th>';
                 echo '<th>User</th>';
                 echo '<th>Floor</th>';
                 echo '<th>Room</th>';
@@ -117,7 +116,6 @@ include 'includes/calendar.php';
 
                     echo '<tr>';
                     echo '<td>' . ($row["start_date"] ?? '-') . '</td>';
-                    echo '<td>' . ($row["end_date"] ?? '-') . '</td>';
                     echo '<td>' . ($row["user_fullname"] ?? '-') . '</td>';
                     echo '<td>IF-' . ($row["floor_id"] ?? '-') . '0' . ($row["room_id"] ?? '-') . '</td>';
                     echo '<td>' . ($row["room_id"] ?? '-') . '</td>';

@@ -30,7 +30,7 @@
     <li class="nav-item">
         <a class="nav-link" href="table_user.php">
             <i class="fas fa-fw fa-table"></i>
-            <span>Work Schdule</span></a>
+            <span>Work Schedule</span></a>
     </li>
 
     <li class="nav-item">

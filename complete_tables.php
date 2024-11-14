@@ -20,16 +20,21 @@ $role_id = $_SESSION['role_id'];
 $current_user_id = $_SESSION['user_id'];
 
 // เลือก Navbar ตามบทบาทของผู้ใช้
-if ($role_id == '1') {
-    include 'includes/navbar.php';
-} elseif ($role_id == '2') {
-    include 'includes/headmaid_navbar.php';
-} elseif ($role_id == '3') {
-    include 'includes/maid_navbar.php';
-} else {
-    echo "ไม่สามารถระบุบทบาทของผู้ใช้ได้";
-    exit;
+switch ($role_id) {
+    case '1':
+        include 'includes/navbar.php';
+        break;
+    case '2':
+        include 'includes/headmaid_navbar.php';
+        break;
+    case '3':
+        include 'includes/maid_navbar.php';
+        break;
+    default:
+        echo "ไม่สามารถระบุบทบาทของผู้ใช้ได้";
+        exit;
 }
+
 include 'includes/calendar.php';
 ?>
 
@@ -43,6 +48,7 @@ include 'includes/calendar.php';
         </div>
         <?php
         date_default_timezone_set('Asia/Bangkok');
+
         // การกำหนดค่าในการเชื่อมต่อฐานข้อมูล
         $servername = "db"; // Use the service name 'db' defined in docker-compose
         $username = "user"; // User defined in docker-compose
@@ -57,46 +63,46 @@ include 'includes/calendar.php';
             die("การเชื่อมต่อล้มเหลว: " . $conn->connect_error);
         }
 
-        // สร้างคำสั่ง SQL เพื่อดึงข้อมูลเฉพาะที่มี end_date ก่อนวันนี้
+        // สร้างคำสั่ง SQL เพื่อดึงข้อมูลเฉพาะที่มี start_date ก่อนวันนี้ และเรียงจากใหม่สุดไปเก่าสุด
         $today = date('Y-m-d');
 
         if ($role_id == 1 || $role_id == 2) {
             $sql = "SELECT 
-        t.task_id,
-        t.start_date,
-        t.end_date,
-        t.user_id,
-        t.floor_id,
-        t.room_id,
-        t.status_id,
-        t.toilet_status_id,
-        t.image,
-        u.fullname AS user_fullname,
-        r.room_name
-    FROM task t
-    INNER JOIN users u ON t.user_id = u.user_id
-    LEFT JOIN room r ON t.room_id = r.room_id
-    WHERE t.end_date < '$today'
-    ORDER BY t.end_date ASC";
+                        t.task_id,
+                        t.start_date,
+                        t.end_date,
+                        t.user_id,
+                        t.floor_id,
+                        t.room_id,
+                        t.status_id,
+                        t.toilet_status_id,
+                        t.image,
+                        u.fullname AS user_fullname,
+                        r.room_name
+                    FROM task t
+                    INNER JOIN users u ON t.user_id = u.user_id
+                    LEFT JOIN room r ON t.room_id = r.room_id
+                    WHERE t.end_date < '$today'
+                    ORDER BY t.end_date DESC";
         } else {
             $sql = "SELECT 
-        t.task_id,
-        t.start_date,
-        t.end_date,
-        t.user_id,
-        t.floor_id,
-        t.room_id,
-        t.status_id,
-        t.toilet_status_id,
-        t.image,
-        u.fullname AS user_fullname,
-        r.room_name
-    FROM task t
-    INNER JOIN users u ON t.user_id = u.user_id
-    LEFT JOIN room r ON t.room_id = r.room_id
-    WHERE t.end_date < '$today'
-    AND t.user_id = $current_user_id
-    ORDER BY t.end_date ASC";
+                        t.task_id,
+                        t.start_date,
+                        t.end_date,
+                        t.user_id,
+                        t.floor_id,
+                        t.room_id,
+                        t.status_id,
+                        t.toilet_status_id,
+                        t.image,
+                        u.fullname AS user_fullname,
+                        r.room_name
+                    FROM task t
+                    INNER JOIN users u ON t.user_id = u.user_id
+                    LEFT JOIN room r ON t.room_id = r.room_id
+                    WHERE t.end_date < '$today'
+                    AND t.user_id = $current_user_id
+                    ORDER BY t.end_date DESC";
         }
 
         $result = $conn->query($sql);
@@ -111,13 +117,14 @@ include 'includes/calendar.php';
             echo '<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">';
             echo '<thead>';
             echo '<tr>';
-            echo '<th>Start Date</th>';
-            echo '<th>End Date</th>';
-            echo '<th>User</th>';
+            echo '<th>Date</th>';
             echo '<th>Floor</th>';
             echo '<th>Room</th>';
             echo '<th>Status</th>';
             echo '<th>Toilet Status</th>';
+            if ($role_id == 1 || $role_id == 2) {
+                echo '<th>User</th>';  // Display User column only for roles 1 and 2
+            }
             echo '<th>Action</th>';
             echo '</tr>';
             echo '</thead>';
@@ -125,39 +132,29 @@ include 'includes/calendar.php';
 
             while ($row = $result->fetch_assoc()) {
                 // แปลงค่า ID เป็นข้อความที่อ่านได้
-                if ($row['status_id'] == 1) {
-                    $status = 'Ready';
-                } elseif ($row['status_id'] == 2) {
-                    $status = 'Not Ready';
-                } elseif ($row['status_id'] == 3) {
-                    $status = 'Waiting';
-                } else {
-                    $status = '-';
-                }
+                $status = match($row['status_id']) {
+                    1 => 'Ready',
+                    2 => 'Not Ready',
+                    3 => 'Waiting',
+                    default => '-',
+                };
 
-                if ($row['toilet_status_id'] == 1) {
-                    $toilet_status = 'Ready';
-                } elseif ($row['toilet_status_id'] == 2) {
-                    $toilet_status = 'Not Ready';
-                } elseif ($row['toilet_status_id'] == 3) {
-                    $toilet_status = 'Waiting';
-                } else {
-                    $toilet_status = '-';
-                }
+                $toilet_status = match($row['toilet_status_id']) {
+                    1 => 'Ready',
+                    2 => 'Not Ready',
+                    3 => 'Waiting',
+                    default => '-',
+                };
 
                 echo '<tr>';
-                echo '<td>' . ($row["start_date"] ?? '-') . '</td>';
                 echo '<td>' . ($row["end_date"] ?? '-') . '</td>';
-                echo '<td>' . ($row["user_fullname"] ?? '-') . '</td>';
                 echo '<td>' . ($row["floor_id"] ?? '-') . '</td>';
-                // ตรวจสอบค่า room_id และแสดง room_name หรือ -
-                if (is_null($row["room_id"])) {
-                    echo '<td>-</td>';
-                } else {
-                    echo '<td>' . ($row["room_name"] ?? '-') . '</td>';
-                }
+                echo '<td>' . ($row["room_name"] ?? '-') . '</td>';
                 echo '<td>' . $status . '</td>';
                 echo '<td>' . $toilet_status . '</td>';
+                if ($role_id == 1 || $role_id == 2) {
+                    echo '<td>' . ($row["user_fullname"] ?? '-') . '</td>';
+                }
                 echo '<td>';
                 if (!empty($row["image"])) {
                     echo '<button type="button" class="btn btn-info btn-circle btn-sm" data-toggle="modal" data-target="#imageModal' . $row["task_id"] . '"><i class="fas fa-image"></i></button>';
@@ -178,13 +175,7 @@ include 'includes/calendar.php';
                 echo '</button>';
                 echo '</div>';
                 echo '<div class="modal-body">';
-                if (!empty($row["image"])) {
-                    $upload_dir = "upload/";
-                    $image_path = $upload_dir . $row["image"];
-                    echo '<img src="' . $image_path . '" class="img-fluid" alt="Image">';
-                } else {
-                    echo 'No Image Available';
-                }
+                echo !empty($row["image"]) ? '<img src="upload/' . $row["image"] . '" class="img-fluid" alt="Image">' : 'No Image Available';
                 echo '</div>';
                 echo '<div class="modal-footer">';
                 echo '<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>';
@@ -208,8 +199,6 @@ include 'includes/calendar.php';
         $conn->close();
         ?>
 
-
-
     </div>
 </div>
 <!-- /.container-fluid -->
@@ -229,8 +218,7 @@ include 'includes/calendar.php';
 </a>
 
 <!-- Logout Modal-->
-<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -253,4 +241,4 @@ include 'includes/calendar.php';
 <?php
 include 'includes/scripts.php';
 include 'includes/footer.php';
-?>
+?> 

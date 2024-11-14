@@ -43,7 +43,7 @@
     <li class="nav-item">
         <a class="nav-link" href="head_calendar.php">
             <i class="fas fa-fw fa-table"></i>
-            <span>Work Schdule</span></a>
+            <span>Work Schedule</span></a>
     </li>
 
     <li class="nav-item">

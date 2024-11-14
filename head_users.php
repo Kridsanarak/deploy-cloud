@@ -69,7 +69,6 @@ include 'includes/calendar.php';
             echo '<th>Name</th>';
             echo '<th>Username</th>';
             echo '<th>Role</th>';
-            echo '<th>Timestamp</th>';
             echo '<th>Status</th>';
             echo '</tr>';
             echo '</thead>';
@@ -96,7 +95,6 @@ include 'includes/calendar.php';
                 echo '<td>' . $row["fullname"] . '</td>';
                 echo '<td>' . $row["username"] . '</td>';
                 echo '<td>' . $role . '</td>';
-                echo '<td>' . $row["timestamp"] . '</td>';
                 echo '<td>' . $status . '</td>';
             }
             echo '</tbody>';

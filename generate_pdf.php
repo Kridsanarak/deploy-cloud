@@ -13,11 +13,10 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// ตั้งค่าวันที่เริ่มและวันที่สิ้นสุด (7 วันจากวันนี้)
+// ตั้งค่าวันที่เป็นวันนี้
 $today = date('Y-m-d');
-$nextWeek = date('Y-m-d', strtotime('+7 days'));
 
-// คำสั่ง SQL สำหรับดึงข้อมูล
+// คำสั่ง SQL สำหรับดึงข้อมูลเฉพาะของวันนี้
 $sql = "SELECT 
     t.task_id,
     t.start_date,
@@ -30,7 +29,7 @@ $sql = "SELECT
 FROM task t
 INNER JOIN users u ON t.user_id = u.user_id
 LEFT JOIN room r ON t.room_id = r.room_id
-WHERE t.start_date >= '$today' AND t.start_date <= '$nextWeek'
+WHERE t.start_date = '$today'
 ORDER BY t.start_date ASC";
 
 $result = $conn->query($sql);
@@ -62,29 +61,27 @@ $pdf->SetFont('helvetica', '', 12);
 $html = '<h1>Task Report for ' . $today . '</h1>';
 $html .= '<table border="1" cellpadding="4">';
 $html .= '<tr>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>User</th>
+            <th>Date</th>
             <th>Floor</th>
             <th>Room</th>
             <th>Status</th>
             <th>Toilet Status</th>
+            <th>User</th>
         </tr>';
 
 while ($row = $result->fetch_assoc()) {
-    // แปลงค่า status_id 
+    // แปลงค่า status_id และ toilet_status_id
     $status = $row['status_id'] == 1 ? 'Ready' : ($row['status_id'] == 2 ? 'Not Ready' : 'Waiting');
     $toilet_status = $row['toilet_status_id'] == 1 ? 'Ready' : ($row['toilet_status_id'] == 2 ? 'Not Ready' : 'Waiting');
 
     // เพิ่มข้อมูลในตาราง HTML
     $html .= '<tr>
                 <td>' . $row["start_date"] . '</td>
-                <td>' . $row["end_date"] . '</td>
-                <td>' . $row["user_fullname"] . '</td>
                 <td>' . $row["floor_id"] . '</td>
                 <td>' . ($row["room_name"] ?? '-') . '</td>
                 <td>' . $status . '</td>
                 <td>' . $toilet_status . '</td>
+                <td>' . $row["user_fullname"] . '</td>
               </tr>';
 }
 
@@ -98,4 +95,4 @@ $pdf->Output('task_report.pdf', 'I');
 
 // ปิดการเชื่อมต่อฐานข้อมูล
 $conn->close();
-?>
+?> 

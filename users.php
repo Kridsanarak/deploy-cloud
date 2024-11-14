@@ -30,6 +30,20 @@ if ($role_id == '1') {
     echo "ไม่สามารถระบุบทบาทของผู้ใช้ได้";
     exit;
 }
+
+if (isset($_SESSION['status'])) {
+    echo "
+    <script type='text/javascript'>
+        $(document).ready(function() {
+            $('#statusModal').modal('show');
+            setTimeout(function() {
+                $('#statusModal').modal('hide');
+            }, 5000); // 5 seconds
+        });
+    </script>
+    ";
+}
+
 ?>
 
 <div class="container-fluid">
@@ -101,7 +115,25 @@ if ($role_id == '1') {
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addadminprofile">
                 Add Users
             </button>
-
+            <div class="modal fade" id="statusModal" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="statusModalLabel">Notification</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <?php
+                echo $_SESSION['status'];
+                unset($_SESSION['status']);
+                ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <!-- End Add User -->
 

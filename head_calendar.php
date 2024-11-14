@@ -125,9 +125,11 @@ if ($result_floor_user && $result_floor_user->num_rows > 0) {
                 t.status_id,
                 t.toilet_status_id,
                 t.image,
-                t.user_id
+                t.user_id,
+                r.room_name
             FROM task t
             INNER JOIN users u ON t.user_id = u.user_id
+            LEFT JOIN room r ON t.room_id = r.room_id
             WHERE t.start_date BETWEEN '$today' AND '$nextWeek' 
             ORDER BY t.start_date ASC";
 
@@ -139,19 +141,19 @@ if ($result_floor_user && $result_floor_user->num_rows > 0) {
                         echo '<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">';
                         echo '<thead>';
                         echo '<tr>';
-                        echo '<th>Start Date</th>';
-                        echo '<th>End Date</th>';
-                        echo '<th>User</th>';
+                        echo '<th>Date</th>';
                         echo '<th>Floor</th>';
+                        echo '<th>Room</th>';
+                        echo '<th>User</th>';
                         echo '</tr>';
                         echo '</thead>';
                         echo '<tbody>';
                         while ($row = $result->fetch_assoc()) {
                             echo '<tr>';
                             echo '<td>' . ($row["start_date"] ?? '-') . '</td>';
-                            echo '<td>' . ($row["end_date"] ?? '-') . '</td>';
-                            echo '<td>' . ($row["user_fullname"] ?? '-') . '</td>';
                             echo '<td>' . ($row["floor_id"] ?? '-') . '</td>';
+                            echo '<td>' . ($row["room_name"] ?? '-') . '</td>';
+                            echo '<td>' . ($row["user_fullname"] ?? '-') . '</td>';
                             echo '</tr>';
                         }
                         echo '</tbody>';
@@ -264,8 +266,7 @@ if ($result_floor_user && $result_floor_user->num_rows > 0) {
                                 echo '<div class="card-body">';
                                 echo '<p>';
                                 echo 'รายละเอียด:<br>';
-                                echo 'เริ่ม: ' . $row["start_date"] . '<br>';
-                                echo 'สิ้นสุด: ' . $row["end_date"] . '<br>';
+                                echo 'Date: ' . $row["start_date"] . '<br>';
                                 echo 'ชั้น: ' . $row["floor_id"] . '<br>';
                                 echo 'ห้อง: ' . ($row["room_name"] ?? '-') . '<br>';
                                 echo 'สถานะ: ';

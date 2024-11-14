@@ -200,7 +200,7 @@ include 'includes/calendar.php';
                                         }
 
                                         // รูปแบบเปอร์เซ็นต์
-                                        $formatted_percentage = number_format($percentage, 1);
+                                        $formatted_percentage = number_format($percentage, 2);
                                         ?>
                                         <span style="font-family: Prompt;"><?php echo $formatted_percentage; ?> %</span>
                                     </div>
@@ -354,8 +354,7 @@ include 'includes/calendar.php';
                                 echo '<div class="card-body">';
                                 echo '<p>';
                                 echo 'รายละเอียด:<br>';
-                                echo 'เริ่ม: ' . $row["start_date"] . '<br>';
-                                echo 'สิ้นสุด: ' . $row["end_date"] . '<br>';
+                                echo 'Date: ' . $row["start_date"] . '<br>';
                                 echo 'ชั้น: ' . $row["floor_id"] . '<br>';
                                 echo 'ห้อง: ' . ($row["room_name"] ?? '-') . '<br>';
                                 echo 'สถานะ: ';

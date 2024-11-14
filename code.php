@@ -5,9 +5,9 @@ session_start();
 // Handle user registration
 if (isset($_POST['registerbtn'])) {
     // เชื่อมต่อฐานข้อมูล
-    $servername = "db"; // Use the service name 'db' defined in docker-compose
-    $username = "user"; // User defined in docker-compose
-    $password = "user_password"; // Password defined in docker-compose
+    $servername = "db";
+    $username = "user";
+    $password = "user_password";
     $dbname = "project_maidmanage";
 
     $connection = new mysqli($servername, $username, $password, $dbname);
@@ -24,26 +24,47 @@ if (isset($_POST['registerbtn'])) {
     $role_id = $_POST['role_id'];
     $status_id = $_POST['status_id'];
 
-    // ใช้ Prepared Statements (ลบ timestamp ออกจาก SQL)
-    $stmt = $connection->prepare("INSERT INTO users (fullname, username, password, role_id, status_id) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssss", $fullname, $username, $password, $role_id, $status_id);
+    // ตรวจสอบ username ซ้ำ
+    $check_username_query = "SELECT * FROM users WHERE username = ?";
+    $check_stmt = $connection->prepare($check_username_query);
+    $check_stmt->bind_param("s", $username);
+    $check_stmt->execute();
+    $result = $check_stmt->get_result();
 
-    if ($stmt->execute()) {
-        $_SESSION['status'] = "User added successfully!";
-        $_SESSION['status_code'] = "success";
-    } else {
-        $_SESSION['status'] = "Failed to add user: " . $stmt->error;
+    if ($result->num_rows > 0) {
+        // กรณี username ซ้ำกัน
+        $_SESSION['status'] = "Username already exists!";
         $_SESSION['status_code'] = "error";
+        
+        // นำกลับไปยังหน้า register.php หรือหน้าอื่นที่ต้องการ
+        header('Location: users.php');
+        exit();
+    } else {
+        // ใช้ Prepared Statements ในการเพิ่มข้อมูล
+        $stmt = $connection->prepare("INSERT INTO users (fullname, username, password, role_id, status_id) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssss", $fullname, $username, $password, $role_id, $status_id);
+
+        if ($stmt->execute()) {
+            $_SESSION['status'] = "User added successfully!";
+            $_SESSION['status_code'] = "success";
+        } else {
+            $_SESSION['status'] = "Failed to add user: " . $stmt->error;
+            $_SESSION['status_code'] = "error";
+        }
+
+        // ปิด Prepared Statements
+        $stmt->close();
     }
 
     // ปิดการเชื่อมต่อ
-    $stmt->close();
+    $check_stmt->close();
     $connection->close();
 
     // นำกลับไปยังหน้า users.php
     header('Location: users.php');
     exit();
 }
+
 
 
 // Handle user deletion
@@ -234,5 +255,24 @@ if (isset($_POST['send_task_btn'])) {
     header('Location: send.php'); // Redirect
 }
 
+if (isset($_POST['reset_task_btn'])) {
+
+    // Connect to the database
+    $servername = "db"; // Use the service name 'db' defined in docker-compose
+    $username = "user"; // User defined in docker-compose
+    $password = "user_password"; // Password defined in docker-compose
+    $dbname = "project_maidmanage";
+
+    $connection = new mysqli($servername, $username, $password, $dbname);
+
+    $task_id = $_POST['task_id'];
+    $status_id = $_POST['status_id'];
+    $toilet_status_id = $_POST['toilet_status_id'];
+
+    $query = "UPDATE task SET status_id = '$status_id', toilet_status_id = '$toilet_status_id' WHERE task_id = '$task_id'";
+    mysqli_query($connection, $query);
+    header("Location: tables.php");  
+    exit();
+}
 
 ?>

@@ -71,7 +71,7 @@ if ($result->num_rows > 0) {
     echo '<div class="card-body">';
     echo '<div class="table-responsive">';
     echo '<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">';
-    echo '<thead><tr><th>Start Date</th><th>End Date</th><th>User</th><th>Floor</th><th>Room</th><th>Status</th><th>Toilet Status</th><th>Action</th></tr></thead><tbody>';
+    echo '<thead><tr><th>Date</th><th>Floor</th><th>Room</th><th>Status</th><th>Toilet Status</th><th>User</th><th>Action</th></tr></thead><tbody>';
    
     while ($row = $result->fetch_assoc()) {
         // แปลงค่า ID เป็นข้อความที่อ่านได้
@@ -97,17 +97,35 @@ if ($result->num_rows > 0) {
 
         echo '<tr>';
         echo '<td>' . ($row["start_date"] ?? '-') . '</td>';
-        echo '<td>' . ($row["end_date"] ?? '-') . '</td>';
-        echo '<td>' . ($row["user_fullname"] ?? '-') . '</td>';
         echo '<td>' . ($row["floor_id"] ?? '-') . '</td>';
         echo '<td>' . ($row["room_name"] ?? '-') . '</td>';
         echo '<td>' . $status . '</td>';
         echo '<td>' . $toilet_status . '</td>';
+        echo '<td>' . ($row["user_fullname"] ?? '-') . '</td>';
         echo '<td>';
-        echo !empty($row["image"]) ? 
-            '<button type="button" class="btn btn-info btn-circle btn-sm" data-toggle="modal" data-target="#imageModal' . $row["task_id"] . '"><i class="fas fa-image"></i></button>' :
-            '<button type="button" class="btn btn-secondary btn-circle btn-sm" disabled><i class="fas fa-image"></i></button>';
-        echo '</td></tr>';
+
+        // ปุ่มดูภาพ
+echo !empty($row["image"]) ? 
+'<button type="button" class="btn btn-info btn-circle btn-sm mr-2" data-toggle="modal" data-target="#imageModal' . $row["task_id"] . '"><i class="fas fa-image"></i></button>' :
+'<button type="button" class="btn btn-secondary btn-circle btn-sm mr-2" disabled><i class="fas fa-image"></i></button>';
+
+// Check if either status or toilet_status is "Ready" (status_id = 1 or toilet_status_id = 1)
+$isReady = ($row['status_id'] == 1 || $row['toilet_status_id'] == 1);
+
+// ฟอร์มสำหรับปุ่มทำใหม่
+echo '<form action="code.php" method="POST" style="display:inline;">';
+echo '<input type="hidden" name="task_id" value="' . $row['task_id'] . '">';
+echo '<input type="hidden" name="status_id" value="2">';  // กำหนดเป็น Not Ready
+echo '<input type="hidden" name="toilet_status_id" value="2">';  // กำหนดเป็น Not Ready
+
+// Use inline conditional to enable or disable the button with color change
+echo ($row['status_id'] == 1 || $row['toilet_status_id'] == 1) ? 
+    '<button type="submit" name="reset_task_btn" class="btn btn-warning btn-circle btn-sm" onclick="return confirm(\'Are you sure you want to reset the status to Not Ready?\');"><i class="fas fa-redo"></i></button>' :
+    '<button type="button" class="btn btn-secondary btn-circle btn-sm" disabled><i class="fas fa-redo"></i></button>';
+
+echo '</form>';
+
+
 
         // Modal แสดงรูปภาพ
         echo '<div class="modal fade" id="imageModal' . $row["task_id"] . '" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel' . $row["task_id"] . '" aria-hidden="true">';
