@@ -19,6 +19,15 @@ if (!isset($_SESSION['role_id']) || !isset($_SESSION['user_id'])) {
 $role_id = $_SESSION['role_id'];
 $current_user_id = $_SESSION['user_id'];
 
+if (isset($_GET['lang'])) {
+    $_SESSION['lang'] = $_GET['lang'];
+}
+
+// กำหนดภาษาเริ่มต้นเป็นภาษาอังกฤษ
+$lang = $_SESSION['lang'] ?? 'th';
+
+// โหลดไฟล์ภาษาตามการเลือกของผู้ใช้
+$translations = include("lang/lang_{$lang}.php");
 ?>
 
 <!-- Begin Page Content -->
@@ -28,16 +37,31 @@ $current_user_id = $_SESSION['user_id'];
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
             <h6 class="m-0 font-weight-bold text-primary">
-                Task :
+                <?php echo $translations['task']; ?> :
                 <span class="mr-2 d-none d-lg-inline text-black-600 bold">
                     <?php echo $_SESSION['full_name']; ?>
                 </span>
             </h6>
-            <a href="main.php" class="btn btn-primary">
-                <i class="bi bi-house"></i> <!-- ใช้ Bootstrap Icon ที่ชื่อ "house-door" -->
-            </a>
+            <div class="d-flex align-items-center">
+                <!-- ปุ่มเปลี่ยนภาษา -->
+                <div class="language-switch mr-2">
+                    <?php
+            $currentLang = isset($_GET['lang']) ? $_GET['lang'] : (isset($_SESSION['lang']) ? $_SESSION['lang'] : 'en');
+            if ($currentLang == 'th') {
+                echo '<a href="?lang=en"><img src="./lang/thailand.png" alt="ภาษาไทย" style="width: 30px; height: auto;"></a>';
+            } else {
+                echo '<a href="?lang=th"><img src="./lang/united-states.png" alt="English" style="width: 30px; height: auto;"></a>';
+            }
+            ?>
+                </div>
+                <!-- ปุ่มไปยัง index.php -->
+                <a href="main.php" class="btn btn-primary">
+                    <i class="bi bi-house"></i> <!-- ใช้ Bootstrap Icon ที่ชื่อ "house-door" -->
+                </a>
+            </div>
         </div>
-        
+
+
         <?php
         date_default_timezone_set('Asia/Bangkok');
         
@@ -90,9 +114,9 @@ $current_user_id = $_SESSION['user_id'];
             echo '<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">';
             echo '<thead>';
             echo '<tr>';
-            echo '<th>Floor</th>';
-            echo '<th>Room</th>';
-            echo '<th>Action</th>';
+            echo '<th>' . $translations['floor'] . '</th>';
+            echo '<th>' . $translations['rooms'] . '</th>';
+            echo '<th>' . $translations['send'] . '</th>';
             echo '</tr>';
             echo '</thead>';
             echo '<tbody>';
@@ -121,7 +145,7 @@ echo '<div class="modal fade" id="sendTaskModal' . $row["task_id"] . '" tabindex
 echo '<div class="modal-dialog" role="document">';
 echo '<div class="modal-content">';
 echo '<div class="modal-header">';
-echo '<h5 class="modal-title" id="sendTaskModalLabel' . $row["task_id"] . '">ส่งงาน</h5>';
+echo '<h5 class="modal-title" id="sendTaskModalLabel' . $row["task_id"] . '">' . $translations['send'] . '</h5>';
 echo '<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
 echo '<span aria-hidden="true">&times;</span>';
 echo '</button>';
@@ -152,57 +176,58 @@ echo '</div>';
             echo '</div>';
         } else {
             echo "<div class='card-body'>";
-            echo "<p class='text-center'>คุณไม่มีงานที่กำหนดไว้ในวันนี้</p>";
+            echo "<p class='text-center'>" . $translations['no_tasks_today'] . "</p>";
             echo "</div>";
         }
         $conn->close();
         ?>
     </div>
 
-<!-- Scroll to Top Button-->
-<a class="scroll-to-top rounded" href="#page-top">
-    <i class="fas fa-angle-up"></i>
-</a>
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
 
-<!-- ปุ่ม Logout -->
-<a class="btn btn-primary" href="#" onclick="showLogoutModal()">Logout</a>
+    <!-- ปุ่ม Logout -->
+    <a class="btn btn-primary" href="#" onclick="showLogoutModal()"> <?php echo $translations['logout']; ?></a>
 
-<!-- โครงสร้าง modal สำหรับการยืนยัน Logout -->
-<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                Select "Logout" below if you are ready to end your current session.
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                <a class="btn btn-primary" href="logout.php">Logout</a>
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"><?php echo $translations['logout_modal_title']; ?>
+                    </h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body"><?php echo $translations['logout_modal_body']; ?></div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button"
+                        data-dismiss="modal"><?php echo $translations['cancel']; ?></button>
+                    <a class="btn btn-primary" href="logout.php"><?php echo $translations['logout']; ?></a>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- JavaScript สำหรับแสดง modal -->
-<script>
+    <!-- JavaScript สำหรับแสดง modal -->
+    <script>
     function showLogoutModal() {
         var logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'), {
             backdrop: 'static'
         });
         logoutModal.show();
     }
-</script>
+    </script>
 
-<!-- Bootstrap core JavaScript-->
-<script src="vendor/jquery/jquery.min.js"></script>
-<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-<?php
+    <?php
 include 'includes/footer.php';
 include 'includes/scripts.php';
 ?>

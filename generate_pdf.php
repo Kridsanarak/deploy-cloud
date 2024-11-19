@@ -43,6 +43,10 @@ $pdf = new TCPDF('L', PDF_UNIT, 'A4', true, 'UTF-8', false);
 $pdf->SetCreator(PDF_CREATOR);
 $pdf->SetAuthor('Your Company');
 $pdf->SetTitle('Daily Task Report');
+
+// กำหนดระยะห่างของ Header
+$pdf->SetHeaderMargin(10); // เพิ่มระยะห่าง (หน่วยเป็น mm)
+
 $pdf->SetHeaderData('', 0, 'Daily Task Report', $today);
 $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
 $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
@@ -50,6 +54,7 @@ $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
 $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
 $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
 $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+
 
 // เพิ่มหน้าใหม่ใน PDF
 $pdf->AddPage();
@@ -61,12 +66,13 @@ $pdf->SetFont('helvetica', '', 12);
 $html = '<h1>Task Report for ' . $today . '</h1>';
 $html .= '<table border="1" cellpadding="4">';
 $html .= '<tr>
-            <th>Date</th>
-            <th>Floor</th>
-            <th>Room</th>
-            <th>Status</th>
-            <th>Toilet Status</th>
-            <th>User</th>
+            <th><strong>Date</strong></th>
+            <th><strong>Floor</strong></th>
+            <th><strong>Room</strong></th>
+            <th><strong>Status</strong></th>
+            <th><strong>Toilet Status</strong></th>
+            <th><strong>User</strong></th>
+
         </tr>';
 
 while ($row = $result->fetch_assoc()) {
@@ -95,4 +101,4 @@ $pdf->Output('task_report.pdf', 'I');
 
 // ปิดการเชื่อมต่อฐานข้อมูล
 $conn->close();
-?> 
+?>

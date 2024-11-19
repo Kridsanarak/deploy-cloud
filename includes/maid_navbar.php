@@ -1,3 +1,16 @@
+<?php
+/// ตรวจสอบว่ามีการเลือกภาษาใหม่ผ่าน URL หรือไม่
+if (isset($_GET['lang'])) {
+    $_SESSION['lang'] = $_GET['lang'];
+}
+
+// กำหนดภาษาเริ่มต้นเป็นภาษาอังกฤษ
+$lang = $_SESSION['lang'] ?? 'th';
+
+// โหลดไฟล์ภาษาตามการเลือกของผู้ใช้
+$translations = include("lang/lang_{$lang}.php");
+?>
+
 <!-- Sidebar -->
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
@@ -6,7 +19,8 @@
         <div class="sidebar-brand-icon rotate-n-15">
             <i class="fas fa-laugh-wink"></i>
         </div>
-        <div class="sidebar-brand-text mx-2" style="font-family: Prompt;">ระบบจัดการแม่บ้าน</div>
+        <div class="sidebar-brand-text mx-2" style="font-family: Prompt;"><?php echo $translations['brand_text']; ?>
+        </div>
     </a>
     <!-- SB Admin <sup>2</sup> -->
     <!-- Divider -->
@@ -17,26 +31,26 @@
 
     <!-- Heading -->
     <div class="sidebar-heading">
-        Interface
+        <?php echo $translations['interface']; ?>
     </div>
 
     <li class="nav-item">
         <a class="nav-link" href="send.php">
             <i class="fas fa-fw fa-paper-plane"></i>
-            <span>Send</span></a>
+            <span><?php echo $translations['send']; ?></span></a>
     </li>
 
     <!-- Nav Item - Pages Collapse Menu -->
     <li class="nav-item">
         <a class="nav-link" href="table_user.php">
             <i class="fas fa-fw fa-table"></i>
-            <span>Work Schedule</span></a>
+            <span><?php echo $translations['work_schedule']; ?></span></a>
     </li>
 
     <li class="nav-item">
         <a class="nav-link" href="complete_tables.php">
             <i class="far fa-folder-open"></i>
-            <span>Complete Work</span></a>
+            <span><?php echo $translations['complete_work']; ?></span></a>
     </li>
 
     <!-- Divider -->
@@ -62,15 +76,16 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                <h5 class="modal-title" id="exampleModalLabel"><?php echo $translations['logout_modal_title']; ?></h5>
                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
-            <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+            <div class="modal-body"><?php echo $translations['logout_modal_body']; ?></div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                <a class="btn btn-primary" href="logout.php">Logout</a>
+                <button class="btn btn-secondary" type="button"
+                    data-dismiss="modal"><?php echo $translations['cancel']; ?></button>
+                <a class="btn btn-primary" href="logout.php"><?php echo $translations['logout']; ?></a>
             </div>
         </div>
     </div>
@@ -115,6 +130,18 @@
                     </div>
                 </li>
 
+                <!-- Language Switcher -->
+                <div class="language-switch">
+                <?php
+                    $currentLang = isset($_GET['lang']) ? $_GET['lang'] : (isset($_SESSION['lang']) ? $_SESSION['lang'] : 'en');
+                        if ($currentLang == 'th') {
+                            echo '<a href="?lang=en"><img src="./lang/thailand.png" alt="ภาษาไทย"  style="width: 30px; height: auto; margin-top: 1.2rem;"></a>';
+                        } else {
+                            echo '<a href="?lang=th"><img src="./lang/united-states.png" alt="English" style="width: 30px; height: auto; margin-top: 1.2rem;"></a>';
+                        }
+                ?>
+                </div>
+
 
                 <div class="topbar-divider d-none d-sm-block"></div>
 
@@ -130,7 +157,7 @@
                         aria-labelledby="userDropdown">
                         <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                             <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                            Logout
+                            <?php echo $translations['logout']; ?>
                         </a>
                     </div>
                 </li>

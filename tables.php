@@ -28,7 +28,7 @@ include 'includes/calendar.php';
 <div class="container-fluid">
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Work Check</h6>
+            <h6 class="m-0 font-weight-bold text-primary"><?php echo $translations['work_check']; ?></h6>
         </div>
         <?php
 date_default_timezone_set('Asia/Bangkok');
@@ -71,29 +71,42 @@ if ($result->num_rows > 0) {
     echo '<div class="card-body">';
     echo '<div class="table-responsive">';
     echo '<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">';
-    echo '<thead><tr><th>Date</th><th>Floor</th><th>Room</th><th>Status</th><th>Toilet Status</th><th>User</th><th>Action</th></tr></thead><tbody>';
+    echo '<thead>';
+    echo '<tr>';
+    echo '<th>' . $translations['date'] . '</th>';
+    echo '<th>' . $translations['floor'] . '</th>';
+    echo '<th>' . $translations['rooms'] . '</th>';
+    echo '<th>' . $translations['status'] . '</th>';
+    echo '<th>' . $translations['toilet_status'] . '</th>';
+    echo '<th>' . $translations['user'] . '</th>';
+    echo '<th>' . $translations['action_table'] . '</th>';
+    echo '</tr>';
+    echo '</thead>';
+    echo '<tbody>';
+
    
     while ($row = $result->fetch_assoc()) {
         // แปลงค่า ID เป็นข้อความที่อ่านได้
         if ($row['status_id'] == 1) {
-            $status = 'Ready';
+            $status = $translations['ready'];
         } elseif ($row['status_id'] == 2) {
-            $status = 'Not Ready';
+            $status = $translations['not_ready'];
         } elseif ($row['status_id'] == 3) {
-            $status = 'Waiting';
+            $status = $translations['waiting'];
         } else {
             $status = '-';
         }
-
+        
         if ($row['toilet_status_id'] == 1) {
-            $toilet_status = 'Ready';
+            $toilet_status = $translations['ready'];
         } elseif ($row['toilet_status_id'] == 2) {
-            $toilet_status = 'Not Ready';
+            $toilet_status = $translations['not_ready'];
         } elseif ($row['toilet_status_id'] == 3) {
-            $toilet_status = 'Waiting';
+            $toilet_status = $translations['waiting'];
         } else {
             $toilet_status = '-';
         }
+        
 
         echo '<tr>';
         echo '<td>' . ($row["start_date"] ?? '-') . '</td>';
@@ -120,7 +133,7 @@ echo '<input type="hidden" name="toilet_status_id" value="2">';  // กำหน
 
 // Use inline conditional to enable or disable the button with color change
 echo ($row['status_id'] == 1 || $row['toilet_status_id'] == 1) ? 
-    '<button type="submit" name="reset_task_btn" class="btn btn-warning btn-circle btn-sm" onclick="return confirm(\'Are you sure you want to reset the status to Not Ready?\');"><i class="fas fa-redo"></i></button>' :
+    '<button type="submit" name="reset_task_btn" class="btn btn-warning btn-circle btn-sm" onclick="return confirm(\'' . $translations['repeat'] . '\');"><i class="fas fa-redo"></i></button>' :
     '<button type="button" class="btn btn-secondary btn-circle btn-sm" disabled><i class="fas fa-redo"></i></button>';
 
 echo '</form>';
@@ -149,13 +162,14 @@ $conn->close();
     </div>
 
     <form action="generate_pdf.php" method="post">
-        <button type="submit" class="btn btn-primary mb-3">Generate PDF</button>
+        <button type="submit" class="btn btn-primary mb-3"><?php echo $translations['generate_PDF']; ?></button>
     </form>
 </div>
 
 <a class="scroll-to-top rounded" href="#page-top"><i class="fas fa-angle-up"></i></a>
 
-<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">

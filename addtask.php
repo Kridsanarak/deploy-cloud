@@ -34,15 +34,13 @@ include 'includes/calendar.php';
 
 <!-- Begin Page Content -->
 <div class="container-fluid">
-    <h1 class="h3 mb-2 text-gray-800">Add Task</h1>
-
     <form action="code.php" method="POST">
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label>Assign User</label>
+                    <label><?php echo $translations['assign_work']; ?></label>
                     <select name="user_id" class="form-control" required>
-                        <option value="">--- Please select ---</option>
+                        <option value=""><?php echo $translations['please_select']; ?> ---</option>
                         <?php
                             $servername = "db"; // Use the service name 'db' defined in docker-compose
                             $username = "user"; // User defined in docker-compose
@@ -61,7 +59,7 @@ include 'includes/calendar.php';
                                     echo '<option value="' . $row['user_id'] . '">' . $row['fullname'] . '</option>';
                                 }
                             } else {
-                                echo '<option value="">No users available</option>';
+                                echo '<option value=' . $translations['no_user'] . '</option>';
                             }
                             $connection->close();
                         ?>
@@ -69,42 +67,43 @@ include 'includes/calendar.php';
                 </div>
 
                 <div class="form-group">
-                    <label>Date</label>
-                    <input type="date" name="task_date" class="form-control" required min="<?php echo date('Y-m-d'); ?>">
+                    <label><?php echo $translations['date']; ?></label>
+                    <input type="date" name="task_date" class="form-control" required
+                        min="<?php echo date('Y-m-d'); ?>">
                 </div>
 
 
                 <div class="form-group">
-                    <label>Floor Number</label>
+                    <label><?php echo $translations['floor']; ?></label>
                     <div class="row">
                         <?php
                         for ($i = 1; $i <= 11; $i++) {
                             echo '<div class="col-3">';
                             echo '<div class="form-check">';
                             echo '<input class="form-check-input" type="checkbox" name="floor_id[]" value="' . $i . '" id="floor_' . $i . '" onchange="fetchRooms()">';
-                            echo '<label class="form-check-label" for="floor_' . $i . '">Floor ' . $i . '</label>';
+                            echo '<label class="form-check-label" for="floor_' . $i . '">' . $translations['floor'] . ' ' . $i . '</label><br>';
                             echo '</div>';
                             echo '</div>';
                         }
                         ?>
                     </div>
                     <div class="form-group">
-                    <label>Room Status</label>
-                    <select name="status_id" class="form-control">
-                        <option value="3">Not Ready</option>
-                        <option value="2">Waiting</option>
-                        <option value="1">Ready</option>
-                    </select>
-                </div>
+                        <label style="margin-top: 1rem;"><?php echo $translations['status']; ?></label>
+                        <select name="status_id" class="form-control">
+                            <option value="2"><?php echo $translations['not_ready']; ?></option>
+                            <option value="1"><?php echo $translations['ready']; ?></option>
+                            <option value="3"><?php echo $translations['waiting']; ?></option>
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <label>Toilet Status</label>
-                    <select name="toilet_status_id" class="form-control">
-                        <option value="3">Not Ready</option>
-                        <option value="2">Waiting</option>
-                        <option value="1">Ready</option>
-                    </select>
-                </div>
+                    <div class="form-group">
+                        <label><?php echo $translations['toilet_status']; ?></label>
+                        <select name="toilet_status_id" class="form-control">
+                            <option value="2"><?php echo $translations['not_ready']; ?></option>
+                            <option value="1"><?php echo $translations['ready']; ?></option>
+                            <option value="3"><?php echo $translations['waiting']; ?></option>
+                        </select>
+                    </div>
 
                 </div>
             </div>
@@ -112,19 +111,20 @@ include 'includes/calendar.php';
             <div class="col-md-6">
                 <div id="roomSelections"></div>
 
-                
+
             </div>
         </div>
 
         <div class="modal-footer">
-            <button type="submit" name="add_task_btn" class="btn btn-primary">Add Task</button>
+            <button type="submit" name="add_task_btn" class="btn btn-primary"><?php echo $translations['assign_work']; ?></button>
         </div>
     </form>
 </div>
 
 <script>
 function fetchRooms() {
-    var selectedFloors = Array.from(document.querySelectorAll('input[name="floor_id[]"]:checked')).map(input => input.value);
+    var selectedFloors = Array.from(document.querySelectorAll('input[name="floor_id[]"]:checked')).map(input => input
+        .value);
     var roomSelections = document.getElementById('roomSelections');
 
     roomSelections.innerHTML = '';
@@ -141,30 +141,34 @@ function fetchRooms() {
 
             // Fetch rooms for the selected floor
             fetch('get_rooms.php?floor_id=' + floorId)
-    .then(response => response.json())
-    .then(data => {
-        data.forEach(room => {
-            var roomCheckboxDiv = document.createElement('div');
-            roomCheckboxDiv.className = 'form-check'; // Bootstrap class for checkbox styling
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(room => {
+                        var roomCheckboxDiv = document.createElement('div');
+                        roomCheckboxDiv.className =
+                            'form-check'; // Bootstrap class for checkbox styling
 
-            var checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.name = 'room_id[' + floorId + '][]'; // Modified to allow multiple room selections per floor
-            checkbox.value = room.room_id;
-            checkbox.id = 'room_' + room.room_id; // Unique ID for each checkbox
-            checkbox.className = 'form-check-input'; // Bootstrap class for checkbox
+                        var checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.name = 'room_id[' + floorId +
+                            '][]'; // Modified to allow multiple room selections per floor
+                        checkbox.value = room.room_id;
+                        checkbox.id = 'room_' + room.room_id; // Unique ID for each checkbox
+                        checkbox.className = 'form-check-input'; // Bootstrap class for checkbox
 
-            var labelCheckbox = document.createElement('label');
-            labelCheckbox.htmlFor = 'room_' + room.room_id; // Link the label to the checkbox
-            labelCheckbox.textContent = room.room_name; // Room name as label text
-            labelCheckbox.className = 'form-check-label'; // Bootstrap class for label styling
+                        var labelCheckbox = document.createElement('label');
+                        labelCheckbox.htmlFor = 'room_' + room
+                            .room_id; // Link the label to the checkbox
+                        labelCheckbox.textContent = room.room_name; // Room name as label text
+                        labelCheckbox.className =
+                            'form-check-label'; // Bootstrap class for label styling
 
-            roomCheckboxDiv.appendChild(checkbox);
-            roomCheckboxDiv.appendChild(labelCheckbox);
-            floorDiv.appendChild(roomCheckboxDiv);
-        });
-    })
-    .catch(error => console.error('Error fetching rooms:', error));
+                        roomCheckboxDiv.appendChild(checkbox);
+                        roomCheckboxDiv.appendChild(labelCheckbox);
+                        floorDiv.appendChild(roomCheckboxDiv);
+                    });
+                })
+                .catch(error => console.error('Error fetching rooms:', error));
 
 
             roomSelections.appendChild(floorDiv);

@@ -38,7 +38,7 @@ include 'includes/calendar.php';
     <!-- DataTales Example -->
     <div class="card shadow mb-4">
     <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Users</h6>
+            <h6 class="m-0 font-weight-bold text-primary"><?php echo $translations['user']; ?></h6>
         </div>
         <?php
         // การกำหนดค่าในการเชื่อมต่อฐานข้อมูล
@@ -66,30 +66,28 @@ include 'includes/calendar.php';
             echo '<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">';
             echo '<thead>';
             echo '<tr>';
-            echo '<th>Name</th>';
-            echo '<th>Username</th>';
-            echo '<th>Role</th>';
-            echo '<th>Status</th>';
+            echo '<th>' . $translations['fullname'] . '</th>';
+            echo '<th>' . $translations['username'] . '</th>';
+            echo '<th>' . $translations['role'] . '</th>';
+            echo '<th>' . $translations['status'] . '</th>';
             echo '</tr>';
             echo '</thead>';
             echo '<tbody>';
             while ($row = $result->fetch_assoc()) {
-                // แปลง role_id เป็นข้อความที่อ่านได้
                 if ($row['role_id'] == 1) {
-                    $role = 'Admin';
+                    $role = $translations['admin'];
                 } elseif ($row['role_id'] == 2) {
-                    $role = 'Headmaid';
+                    $role = $translations['head_maid'];
                 } else {
-                    $role = 'Maid';
+                    $role = $translations['maid'];
                 }
 
-                // แปลง status_id เป็นข้อความที่อ่านได้
                 if ($row['status_id'] == 1) {
-                    $status = 'พร้อม';
-                } elseif ($row['status_id'] == 2) {
-                    $status = 'ไม่พร้อม';
+                    $status = $translations['ready'];
+                } elseif ($row['status_id'] == 3) {
+                    $status = $translations['leave'];
                 } else {
-                    $status = 'ลา';
+                    $status = $translations['not_ready'];
                 }
                 echo '<tr>';
                 echo '<td>' . $row["fullname"] . '</td>';

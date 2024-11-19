@@ -1,7 +1,6 @@
 <?php
 session_start();
 include 'includes/header.php';
-include 'includes/calendar.php';
 
 // เช็ค Role
 if (!isset($_SESSION['role_id'])) {
@@ -47,7 +46,6 @@ if (isset($_SESSION['status'])) {
 ?>
 
 <div class="container-fluid">
-    <h1 class="h3 mb-2 text-gray-800">Users</h1>
     <div class="card shadow mb-4">
 
         <!-- Add User -->
@@ -57,7 +55,7 @@ if (isset($_SESSION['status'])) {
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Add Users</h5>
+                            <h5 class="modal-title" id="exampleModalLabel"><?php echo $translations['add_user']; ?></h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -67,37 +65,37 @@ if (isset($_SESSION['status'])) {
                             <div class="modal-body">
 
                                 <div class="form-group">
-                                    <label> Fullname </label>
+                                    <label><?php echo $translations['fullname']; ?></label>
                                     <input type="text" name="fullname" class="form-control"
-                                        placeholder="Enter Fullname">
+                                        placeholder="<?php echo $translations['enter_fullname']; ?>">
                                 </div>
                                 <div class="form-group">
-                                    <label> Username </label>
+                                    <label><?php echo $translations['username']; ?></label>
                                     <input type="text" name="username" class="form-control"
-                                        placeholder="Enter Username">
+                                        placeholder="<?php echo $translations['enter_username']; ?>">
                                 </div>
                                 <div class="form-group">
-                                    <label>Password</label>
+                                    <label><?php echo $translations['password']; ?></label>
                                     <input type="password" name="password" class="form-control"
-                                        placeholder="Enter Password">
+                                        placeholder="<?php echo $translations['enter_password']; ?>">
                                 </div>
                                 <div class="form-group">
-                                    <label> Role </label>
+                                    <label><?php echo $translations['role']; ?></label>
                                     <select name="role_id" class="form-control">
-                                        <option value="">--- Please select ---</option>
-                                        <option value="1">Admin</option>
-                                        <option value="2">หัวหน้าแม่บ้าน</option>
-                                        <option value="3">แม่บ้าน</option>
+                                        <option value=""><?php echo $translations['please_select']; ?> ---</option>
+                                        <option value="1"><?php echo $translations['admin']; ?></option>
+                                        <option value="2"><?php echo $translations['head_maid']; ?></option>
+                                        <option value="3"><?php echo $translations['maid']; ?></option>
                                     </select>
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Status</label>
+                                    <label><?php echo $translations['status']; ?></label>
                                     <select name="status_id" class="form-control">
-                                        <option value="">--- Please select ---</option>
-                                        <option value="1">พร้อม</option>
-                                        <option value="2">ไม่พร้อม</option>
-                                        <option value="3">ลา</option>
+                                        <option value=""><?php echo $translations['please_select']; ?> ---</option>
+                                        <option value="1"><?php echo $translations['ready']; ?></option>
+                                        <option value="2"><?php echo $translations['not_ready']; ?></option>
+                                        <option value="3"><?php echo $translations['leave']; ?></option>
                                     </select>
                                 </div>
 
@@ -113,7 +111,7 @@ if (isset($_SESSION['status'])) {
             </div>
 
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addadminprofile">
-                Add Users
+                <?php echo $translations['add_user']; ?>
             </button>
             <div class="modal fade" id="statusModal" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel"
                 aria-hidden="true">
@@ -162,30 +160,31 @@ if (isset($_SESSION['status'])) {
             echo '<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">';
             echo '<thead>';
             echo '<tr>';
-            echo '<th>Name</th>';
-            echo '<th>Username</th>';
-            echo '<th>Role</th>';
-            echo '<th>Timestamp</th>';
-            echo '<th>Status</th>';
-            echo '<th>Action</th>';
+            echo '<th>' . $translations['fullname'] . '</th>';
+            echo '<th>' . $translations['username'] . '</th>';
+            echo '<th>' . $translations['role'] . '</th>';
+            echo '<th>' . $translations['timestamp'] . '</th>';
+            echo '<th>' . $translations['status'] . '</th>';
+            echo '<th>' . $translations['action'] . '</th>';
+
             echo '</tr>';
             echo '</thead>';
             echo '<tbody>';
             while ($row = $result->fetch_assoc()) {
                 if ($row['role_id'] == 1) {
-                    $role = 'Admin';
+                    $role = $translations['admin'];
                 } elseif ($row['role_id'] == 2) {
-                    $role = 'Headmaid';
+                    $role = $translations['head_maid'];
                 } else {
-                    $role = 'Maid';
+                    $role = $translations['maid'];
                 }
 
                 if ($row['status_id'] == 1) {
-                    $status = 'พร้อม';
+                    $status = $translations['ready'];
                 } elseif ($row['status_id'] == 3) {
-                    $status = 'ลา';
+                    $status = $translations['leave'];
                 } else {
-                    $status = 'ไม่พร้อม';
+                    $status = $translations['not_ready'];
                 }
 
                 echo '<tr>';
@@ -213,7 +212,7 @@ if (isset($_SESSION['status'])) {
                 echo '<div class="modal-dialog" role="document">';
                 echo '<div class="modal-content">';
                 echo '<div class="modal-header">';
-                echo '<h5 class="modal-title" id="editAdminProfileLabel' . $row["user_id"] . '">Edit User Profile</h5>';
+                echo '<h5 class="modal-title" id="editAdminProfileLabel' . $row["user_id"] . '">' . $translations['edit_user_profile'] . '</h5>';
                 echo '<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
                 echo '<span aria-hidden="true">&times;</span>';
                 echo '</button>';
@@ -222,37 +221,37 @@ if (isset($_SESSION['status'])) {
                 echo '<div class="modal-body">';
                 echo '<input type="hidden" name="user_id" value="' . $row["user_id"] . '">';
                 echo '<div class="form-group">';
-                echo '<label>Fullname</label>';
+                echo '<label>'. $translations['fullname'] .'</label>';
                 echo '<input type="text" name="fullname" class="form-control" value="' . htmlspecialchars($row["fullname"], ENT_QUOTES, 'UTF-8') . '">';
                 echo '</div>';
                 echo '<div class="form-group">';
-                echo '<label>Username</label>';
+                echo '<label>'. $translations['username'] .'</label>';
                 echo '<input type="text" name="username" class="form-control" value="' . htmlspecialchars($row["username"], ENT_QUOTES, 'UTF-8') . '">';
                 echo '</div>';
                 echo '<div class="form-group">';
-                echo '<label>Password</label>';
+                echo '<label>'. $translations['password'] .'</label>';
                 echo '<input type="password" name="password" class="form-control" value="' . htmlspecialchars($row["password"], ENT_QUOTES, 'UTF-8') . '">';
                 echo '</div>';
                 echo '<div class="form-group">';
-                echo '<label>Role</label>';
+                echo '<label>'. $translations['role'] .'</label>';
                 echo '<select name="role_id" class="form-control">';
-                echo '<option value="1" ' . ($row["role_id"] == 1 ? "selected" : "") . '>Admin</option>';
-                echo '<option value="2" ' . ($row["role_id"] == 2 ? "selected" : "") . '>Headmaid</option>';
-                echo '<option value="3" ' . ($row["role_id"] == 3 ? "selected" : "") . '>Maid</option>';
+                echo '<option value="1"> ' . $translations['admin'] . '</option>';
+                echo '<option value="2"> ' . $translations['head_maid'] . '</option>';
+                echo '<option value="3"> ' . $translations['maid'] . '</option>';
                 echo '</select>';
                 echo '</div>';
                 echo '<div class="form-group">';
-                echo '<label>Status</label>';
+                echo '<label>'. $translations['status'] .'</label>';
                 echo '<select name="status_id" class="form-control">';
-                echo '<option value="1" ' . ($row["status_id"] == 1 ? "selected" : "") . '>พร้อม</option>';
-                echo '<option value="2" ' . ($row["status_id"] == 2 ? "selected" : "") . '>ไม่พร้อม</option>';
-                echo '<option value="3" ' . ($row["status_id"] == 3 ? "selected" : "") . '>ลา</option>';
+                echo '<option value="1"> ' . $translations['ready'] . '</option>';
+                echo '<option value="2"> ' . $translations['not_ready'] . '</option>';
+                echo '<option value="3"> ' . $translations['leave'] . '</option>';
                 echo '</select>';
                 echo '</div>';
                 echo '</div>';
                 echo '<div class="modal-footer">';
-                echo '<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>';
-                echo '<button type="submit" name="edit_user_btn" class="btn btn-primary">Save Changes</button>';
+                echo '<button type="button" class="btn btn-secondary" data-dismiss="modal">' . $translations['cancel'] . '</button>';
+                echo '<button type="submit" name="edit_user_btn" class="btn btn-primary">' . $translations['save'] . '</button>';
                 echo '</div>';
                 echo '</form>';
                 echo '</div>';

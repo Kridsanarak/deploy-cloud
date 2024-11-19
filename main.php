@@ -19,10 +19,6 @@ if (!isset($_SESSION['role_id'])) {
 $role_id = $_SESSION['role_id'];
 $user_id = $_SESSION['user_id'];
 
-// โหลดไฟล์ภาษา
-$lang = $_SESSION['lang'] ?? 'en';
-$translations = include("lang/lang_{$lang}.php");
-
 // เลือก Navbar ตามบทบาทของผู้ใช้
 if ($role_id == '1') {
     include 'includes/navbar.php';
@@ -254,55 +250,10 @@ include 'includes/calendar.php';
                         // กำหนดเขตเวลา
                         date_default_timezone_set('Asia/Bangkok');
                         $today = date('Y-m-d');
+                        $sql = $role_id == '3' 
+                            ? "SELECT t.task_id, t.start_date, t.floor_id, t.room_id, u.fullname AS user_fullname, t.status_id, t.toilet_status_id, t.image, r.room_name, rt.room_type_id FROM task t INNER JOIN users u ON t.user_id = u.user_id LEFT JOIN room r ON t.room_id = r.room_id LEFT JOIN room_type rt ON r.room_type_id = rt.room_type_id WHERE t.start_date = '$today' AND t.user_id = '$user_id' ORDER BY t.start_date ASC"
+                            : "SELECT t.task_id, t.start_date, t.floor_id, t.room_id, u.fullname AS user_fullname, t.status_id, t.toilet_status_id, t.image, r.room_name, rt.room_type_id FROM task t INNER JOIN users u ON t.user_id = u.user_id LEFT JOIN room r ON t.room_id = r.room_id LEFT JOIN room_type rt ON r.room_type_id = rt.room_type_id WHERE t.start_date = '$today' ORDER BY t.start_date ASC";
 
-                        // สร้างคำสั่ง SQL เพื่อดึงข้อมูลของทุก user_id และรวมตาราง room_type
-                        if ($role_id == '3') {
-                            $user_id = $_SESSION['user_id']; // รับ user_id จาก session
-                        
-                            // สร้างคำสั่ง SQL เพื่อดึงข้อมูลของทุก user_id และรวมตาราง room_type โดยแสดงเฉพาะ user_id ของผู้ใช้ที่มี role_id = 3
-                            $sql = "SELECT 
-                                t.task_id,
-                                t.start_date,
-                                t.end_date,
-                                u.fullname AS user_fullname,
-                                t.floor_id,
-                                t.room_id,
-                                t.status_id,
-                                t.toilet_status_id,
-                                t.image,
-                                r.room_name,
-                                r.room_type_id,
-                                rt.room_type_name
-                            FROM task t
-                            INNER JOIN users u ON t.user_id = u.user_id
-                            LEFT JOIN room r ON t.room_id = r.room_id
-                            LEFT JOIN room_type rt ON r.room_type_id = rt.room_type_id
-                            WHERE t.start_date = '$today' AND t.user_id = '$user_id'
-                            ORDER BY t.start_date ASC";
-                        } else {
-                            // คำสั่ง SQL สำหรับผู้ใช้ที่มี role_id ไม่ใช่ 3
-                            $sql = "SELECT 
-                                t.task_id,
-                                t.start_date,
-                                t.end_date,
-                                u.fullname AS user_fullname,
-                                t.floor_id,
-                                t.room_id,
-                                t.status_id,
-                                t.toilet_status_id,
-                                t.image,
-                                r.room_name,
-                                r.room_type_id,
-                                rt.room_type_name
-                            FROM task t
-                            INNER JOIN users u ON t.user_id = u.user_id
-                            LEFT JOIN room r ON t.room_id = r.room_id
-                            LEFT JOIN room_type rt ON r.room_type_id = rt.room_type_id
-                            WHERE t.start_date = '$today'
-                            ORDER BY t.start_date ASC";
-                        }
-
-                        // รันคำสั่ง SQL
                         $result = $conn->query($sql);
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
@@ -311,7 +262,6 @@ include 'includes/calendar.php';
                                 echo '<h2 class="mb-0">';
                                 echo '<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse' . $row["task_id"] . '" aria-expanded="true" aria-controls="collapse' . $row["task_id"] . '">';
 
-                                // กำหนดไอคอนสถานะ
                                 $status_icon = '';
                                 if (($row["status_id"] == 1 || is_null($row["status_id"])) && ($row["toilet_status_id"] == 1 || is_null($row["toilet_status_id"]))) {
                                     $status_icon = '<i class="fas fa-check-circle text-success"></i>'; // ไอคอนสีเขียว
@@ -319,50 +269,43 @@ include 'includes/calendar.php';
                                     $status_icon = '<i class="fas fa-exclamation-circle text-danger"></i>'; // ไอคอนสีแดง
                                 }
 
-                                echo "Floor " . $row["floor_id"] . ' - ' . $row["user_fullname"] . ' ' . $status_icon;
+                                echo $translations['floor'] . ' ' . $row["floor_id"] . ' - ' . $row["user_fullname"] . ' ' . $status_icon;
                                 echo '</button>';
                                 echo '</h2>';
                                 echo '</div>';
                                 echo '<div id="collapse' . $row["task_id"] . '" class="collapse" aria-labelledby="heading' . $row["task_id"] . '" data-parent="#taskAccordion">';
                                 echo '<div class="card-body">';
                                 echo '<p>';
-                                echo 'รายละเอียด:<br>';
-                                echo 'Date: ' . $row["start_date"] . '<br>';
-                                echo 'ชั้น: ' . $row["floor_id"] . '<br>';
-                                echo 'ห้อง: ' . ($row["room_name"] ?? '-') . '<br>';
-                                echo 'สถานะ: ';
-
-                                // แสดงสถานะของงาน
-                                switch ($row["status_id"]) {
+                                echo $translations['task_details'] . ':<br>';
+                                echo $translations['date'] . ': ' . $row["start_date"] . '<br>';
+                                echo $translations['room'] . ': ' . ($row["room_name"] ?? '-') . '<br>';
+                                echo $translations['status'] . ': ' . ($row["status_id"] == 1 ? $translations['ready'] : $translations['not_ready']) . '<br>';
+                                echo $translations['room_type'] . ': ' ;
+                                switch ($row["room_type_id"]) {
                                     case 1:
-                                        echo 'Ready';
+                                        echo $translations['lecture'];
                                         break;
                                     case 2:
-                                        echo 'Not Ready';
+                                        echo $translations['meeting'];
                                         break;
                                     case 3:
-                                        echo 'Waiting';
+                                        echo $translations['lab'];
                                         break;
                                     default:
                                         echo '-';
                                         break;
                                 }
                                 echo '<br>';
-
-                                // แสดงประเภทห้อง
-                                echo 'ประเภท: ' . ($row["room_type_name"] ?? '-') . '<br>';
-
-                                // แสดงสถานะห้องน้ำ
-                                echo 'สถานะห้องน้ำ: ';
+                                echo $translations['toilet_status'] . ': ';
                                 switch ($row["toilet_status_id"]) {
                                     case 1:
-                                        echo 'Ready';
+                                        echo $translations['ready'];
                                         break;
                                     case 2:
-                                        echo 'Not Ready';
+                                        echo $translations['not_ready'];
                                         break;
                                     case 3:
-                                        echo 'Waiting';
+                                        echo $translations['waiting'];
                                         break;
                                     default:
                                         echo '-';
@@ -376,7 +319,7 @@ include 'includes/calendar.php';
                                     $image_path = $upload_dir . $row["image"];
                                     echo '<img src="' . $image_path . '" class="img-thumbnail" alt="Image" style="max-width: 100px; max-height: 100px;">';
                                 } else {
-                                    echo 'No Image';
+                                    echo $translations['no_image'];
                                 }
                                 echo '</p>';
                                 echo '</div>';

@@ -110,7 +110,7 @@ if ($result_floor_user && $result_floor_user->num_rows > 0) {
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Work This Week</h6>
+                    <h6 class="m-0 font-weight-bold text-primary"><?php echo $translations['week_work']; ?></h6>
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
@@ -141,10 +141,10 @@ if ($result_floor_user && $result_floor_user->num_rows > 0) {
                         echo '<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">';
                         echo '<thead>';
                         echo '<tr>';
-                        echo '<th>Date</th>';
-                        echo '<th>Floor</th>';
-                        echo '<th>Room</th>';
-                        echo '<th>User</th>';
+                        echo '<th>' . $translations['date'] . '</th>';
+                        echo '<th>' . $translations['floor'] . '</th>';
+                        echo '<th>' . $translations['rooms'] . '</th>';
+                        echo '<th>' . $translations['user'] . '</th>';
                         echo '</tr>';
                         echo '</thead>';
                         echo '<tbody>';
@@ -171,7 +171,7 @@ if ($result_floor_user && $result_floor_user->num_rows > 0) {
                     <i class="fas fa-angle-up"></i>
                 </a>
 
-                <!-- Logout Modal-->
+                <!-- Logout Modal
                 <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
                     aria-hidden="true">
                     <div class="modal-dialog" role="document">
@@ -190,7 +190,7 @@ if ($result_floor_user && $result_floor_user->num_rows > 0) {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
 
@@ -199,7 +199,7 @@ if ($result_floor_user && $result_floor_user->num_rows > 0) {
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Today Work Detail</h6>
+                    <h6 class="m-0 font-weight-bold text-primary"><?php echo $translations['today_work']; ?></h6>
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
@@ -208,7 +208,6 @@ if ($result_floor_user && $result_floor_user->num_rows > 0) {
                             .card-body p {
                                 font-family: 'Prompt', sans-serif;
                                 font-size: 16px;
-                                color: #333;
                                 padding: 10px;
                             }
                         </style>
@@ -258,50 +257,44 @@ if ($result_floor_user && $result_floor_user->num_rows > 0) {
                                     $status_icon = '<i class="fas fa-exclamation-circle text-danger"></i>'; // ไอคอนสีแดง
                                 }
 
-                                echo "Floor " . $row["floor_id"] . ' - ' . $row["user_fullname"] . ' ' . $status_icon;
+                                echo $translations['floor'] . ' '. $row["floor_id"] . ' - ' . $row["user_fullname"] . ' ' . $status_icon;
                                 echo '</button>';
                                 echo '</h2>';
                                 echo '</div>';
                                 echo '<div id="collapse' . $row["task_id"] . '" class="collapse" aria-labelledby="heading' . $row["task_id"] . '" data-parent="#taskAccordion">';
                                 echo '<div class="card-body">';
                                 echo '<p>';
-                                echo 'รายละเอียด:<br>';
-                                echo 'Date: ' . $row["start_date"] . '<br>';
-                                echo 'ชั้น: ' . $row["floor_id"] . '<br>';
-                                echo 'ห้อง: ' . ($row["room_name"] ?? '-') . '<br>';
-                                echo 'สถานะ: ';
-
-                                // แสดงสถานะของงาน
-                                switch ($row["status_id"]) {
+                                echo $translations['task_details'] . ':<br>';
+                                echo $translations['date'] . ': ' . $row["start_date"] . '<br>';
+                                echo $translations['floor'] . ': ' . $row["floor_id"] . '<br>';
+                                echo $translations['room'] . ': ' . ($row["room_name"] ?? '-') . '<br>';
+                                echo $translations['status'] . ': ' . ($row["status_id"] == 1 ? $translations['ready'] : $translations['not_ready']) . '<br>';
+                                echo $translations['room_type'] . ': ' ;
+                                switch ($row["room_type_id"]) {
                                     case 1:
-                                        echo 'Ready';
+                                        echo $translations['lecture'];
                                         break;
                                     case 2:
-                                        echo 'Not Ready';
+                                        echo $translations['meeting'];
                                         break;
                                     case 3:
-                                        echo 'Waiting';
+                                        echo $translations['lab'];
                                         break;
                                     default:
                                         echo '-';
                                         break;
                                 }
                                 echo '<br>';
-
-                                // แสดงประเภทห้อง
-                                echo 'ประเภท: ' . ($row["room_type_name"] ?? '-') . '<br>';
-
-                                // แสดงสถานะห้องน้ำ
-                                echo 'สถานะห้องน้ำ: ';
+                                echo $translations['toilet_status'] . ': ';
                                 switch ($row["toilet_status_id"]) {
                                     case 1:
-                                        echo 'Ready';
+                                        echo $translations['ready'];
                                         break;
                                     case 2:
-                                        echo 'Not Ready';
+                                        echo $translations['not_ready'];
                                         break;
                                     case 3:
-                                        echo 'Waiting';
+                                        echo $translations['waiting'];
                                         break;
                                     default:
                                         echo '-';
@@ -314,7 +307,7 @@ if ($result_floor_user && $result_floor_user->num_rows > 0) {
                                     $image_path = $upload_dir . $row["image"];
                                     echo '<img src="' . $image_path . '" class="img-thumbnail" alt="Image" style="max-width: 100px; max-height: 100px;">';
                                 } else {
-                                    echo 'No Image';
+                                    echo $translations['no_image'];
                                 }
                                 echo '</p>';
                                 echo '</div>';

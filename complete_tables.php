@@ -44,7 +44,7 @@ include 'includes/calendar.php';
     <!-- DataTales Example -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">DataTables</h6>
+            <h6 class="m-0 font-weight-bold text-primary"><?php echo $translations['data_table']; ?></h6>
         </div>
         <?php
         date_default_timezone_set('Asia/Bangkok');
@@ -117,35 +117,41 @@ include 'includes/calendar.php';
             echo '<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">';
             echo '<thead>';
             echo '<tr>';
-            echo '<th>Date</th>';
-            echo '<th>Floor</th>';
-            echo '<th>Room</th>';
-            echo '<th>Status</th>';
-            echo '<th>Toilet Status</th>';
+            echo '<th>' . $translations['date'] . '</th>';
+            echo '<th>' . $translations['floor'] . '</th>';
+            echo '<th>' . $translations['rooms'] . '</th>';
+            echo '<th>' . $translations['status'] . '</th>';
+            echo '<th>' . $translations['toilet_status'] . '</th>';
             if ($role_id == 1 || $role_id == 2) {
-                echo '<th>User</th>';  // Display User column only for roles 1 and 2
+                echo '<th>' . $translations['user'] . '</th>';  // Display User column only for roles 1 and 2
             }
-            echo '<th>Action</th>';
+            echo '<th>' . $translations['action_table'] . '</th>';
             echo '</tr>';
             echo '</thead>';
             echo '<tbody>';
 
             while ($row = $result->fetch_assoc()) {
                 // แปลงค่า ID เป็นข้อความที่อ่านได้
-                $status = match($row['status_id']) {
-                    1 => 'Ready',
-                    2 => 'Not Ready',
-                    3 => 'Waiting',
-                    default => '-',
-                };
-
-                $toilet_status = match($row['toilet_status_id']) {
-                    1 => 'Ready',
-                    2 => 'Not Ready',
-                    3 => 'Waiting',
-                    default => '-',
-                };
-
+                if ($row['status_id'] == 1) {
+                    $status = $translations['ready'];
+                } elseif ($row['status_id'] == 2) {
+                    $status = $translations['not_ready'];
+                } elseif ($row['status_id'] == 3) {
+                    $status = $translations['waiting'];
+                } else {
+                    $status = '-';
+                }
+                
+                if ($row['toilet_status_id'] == 1) {
+                    $toilet_status = $translations['ready'];
+                } elseif ($row['toilet_status_id'] == 2) {
+                    $toilet_status = $translations['not_ready'];
+                } elseif ($row['toilet_status_id'] == 3) {
+                    $toilet_status = $translations['waiting'];
+                } else {
+                    $toilet_status = '-';
+                }
+                
                 echo '<tr>';
                 echo '<td>' . ($row["end_date"] ?? '-') . '</td>';
                 echo '<td>' . ($row["floor_id"] ?? '-') . '</td>';
