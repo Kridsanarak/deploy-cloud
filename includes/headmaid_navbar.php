@@ -152,7 +152,7 @@ $translations = include("lang/lang_{$lang}.php");
                 <!-- Language Switcher -->
                 <div class="language-switch">
                 <?php
-                    $currentLang = isset($_GET['lang']) ? $_GET['lang'] : (isset($_SESSION['lang']) ? $_SESSION['lang'] : 'en');
+                    $currentLang = isset($_GET['lang']) ? $_GET['lang'] : (isset($_SESSION['lang']) ? $_SESSION['lang'] : 'th');
                         if ($currentLang == 'th') {
                             echo '<a href="?lang=en"><img src="./lang/thailand.png" alt="ภาษาไทย"  style="width: 30px; height: auto; margin-top: 1.2rem;"></a>';
                         } else {
